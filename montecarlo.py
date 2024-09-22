@@ -4,7 +4,7 @@
     Given a Process P, characterized by a function P(t) placed in (x,y) = (0,0);
     A set of sensors [S1,S2,...,SN], characterized by an error of sensing N(mu,sigma), placed in (xi,yi);
     An area of interest placed in (xA,yA);
-    And transport mechansim f(P(t),Si) = P(t)*(1/d(P,Si))+Error(mu,sigma,t), where d(P,Si) is the euclidean distance
+    And transport mechanism f(P(t),Si) = P(t)*(1/d(P,Si)^2 )+Error(mu,sigma,t), where d(P,Si) is the euclidean distance
     between the Process and the Sensor;
     This code aims to compute the relationship between the Process, the sensed value from a sensor and the radiation
     rate in the area A.
@@ -17,6 +17,7 @@
 
     21/09/2024  michele.digiovanni@unicampania.it
 """
+from random import random, choice
 from typing import List, Union
 
 import numpy as np
@@ -25,6 +26,7 @@ import matplotlib.pyplot as plt
 
 class Place:
     def __init__(self, x, y):
+        # distance in meters from the origin
         self.x = x
         self.y = y
 
@@ -63,6 +65,27 @@ class RandomWalkProcess(Process):
         return self.val
 
 
+class SpikeProcess(Process):
+    def __init__(self, probabilistic_characterization: ProbabilisticCharacterization, start_val, spike_rate,
+                 spike_range):
+        super().__init__()
+        self.probabilistic_characterization = probabilistic_characterization
+        self.val = start_val
+        self.spike_rate = spike_rate
+        self.spike_range = spike_range
+
+    def generate(self):
+        if random() > self.spike_rate:
+            self.val = self.val + np.random.normal(self.probabilistic_characterization.mu,
+                                                   self.probabilistic_characterization.sigma)
+            return self.val
+        else:
+            return self.val + choice(self.spike_range)
+
+    def __probabilistic_return(self):
+        return choice(self.spike_range) if random() < self.spike_rate else 0
+
+
 class Sensor:
     def __init__(self, place: Place, probabilistic_characterization: ProbabilisticCharacterization):
         self.place: Place = place
@@ -91,17 +114,26 @@ def generate_table():
     pass
 
 
+# @TODO: how can i compute the threshold for the sensor? It can't be adjusted only by comparing f(p,si) < threshold/d(p,si)
+#       otherwise it would oly be scaled but will not take into consideration that a very distant sensor can provide
+#       a very bad insight
+
 if __name__ == '__main__':
-    p: RandomWalkProcess = RandomWalkProcess(ProbabilisticCharacterization(2, 5), 10000, drift=0)
-    s1: Sensor = Sensor(Place(10, 20), ProbabilisticCharacterization(0, 0.05))
-    s2: Sensor = Sensor(Place(10, -20), ProbabilisticCharacterization(0, 0.05))
-    a: AreaOfInterest = AreaOfInterest([Place(30, 0)])
+    p: Process = SpikeProcess(ProbabilisticCharacterization(0, 0.02), 100, spike_rate=0.07, spike_range=np.linspace(0,
+                                                                                                                    70))
+    # RandomWalkProcess(ProbabilisticCharacterization(2, 5), 10000, drift=0)
+    s1: Sensor = Sensor(Place(1, 2), ProbabilisticCharacterization(0, 0.3))
+    s2: Sensor = Sensor(Place(1, -2), ProbabilisticCharacterization(0, 0.05))
+    a: AreaOfInterest = AreaOfInterest([Place(5, 0)])
 
     ps = []
     s1s = []
     s2s = []
     ass = []
+    alerts = []
 
+    # custom threshold for activation
+    threshold = 130
     # ps = [p.generate() for _ in range(100)]
     # plt.figure(figsize=(20, 6))
     # plt.plot(ps)
@@ -113,6 +145,10 @@ if __name__ == '__main__':
         s1s.append(transport_formula(v, s1.probabilistic_characterization, p.place, s1.place))
         s2s.append(transport_formula(v, s2.probabilistic_characterization, p.place, s2.place))
         ass.append(transport_formula(v, None, p.place, a.places[0]))
+        if v > threshold:
+            alerts.append(1)
+        else:
+            alerts.append(0)
 
     fig, axs = plt.subplots(2, 2, figsize=(10, 8))
 
@@ -136,4 +172,8 @@ if __name__ == '__main__':
     plt.tight_layout()
 
     # Display the plots
+    plt.show()
+
+    plt.figure(figsize=(20, 6))
+    plt.plot(alerts)
     plt.show()
