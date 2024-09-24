@@ -77,46 +77,40 @@ def expected_value(psuccess, dpaoi, dps, sigma, measure):
     return psuccess * (((dpaoi / dps) ** 2) * (1 / (sigma ** 2))) * measure
 
 
-def temporal_expected_value(psuccess, dpaoi, dps, sigma, measures, decay=0.5):
+def temporal_expected_value(psuccess, dpaoi, dps, sigma, measure, decay=0.5):
     tev = 0
-    for i in range(len(measures)):
-        tev = tev + np.exp(-decay * (len(measures) - i)) * expected_value(psuccess, dpaoi, dps, sigma, measures[i])
+    for i in range(len(measure)):
+        tev = tev + np.exp(-decay * (len(measure) - i)) * expected_value(psuccess, dpaoi, dps, sigma, measure[i])
     return tev
 
 
-def temporal_expected_radiations(measures, geometry: Geometry):
+def expected_radiations(measures, geometry: Geometry, temporal=False):
     num_sensors = len(geometry.sensors)
     num_ev = 0
     den_ev = 0
     dpaoi = np.sqrt((geometry.process.place.x - geometry.aoi.places[0].x) ** 2 + (
             geometry.process.place.y - geometry.aoi.places[0].y) ** 2)
+    f = {True: temporal_expected_value, False: expected_value}
+
     for i in range(num_sensors):
         dps = np.sqrt((geometry.process.place.x - geometry.sensors[i].place.x) ** 2 + (
                 geometry.process.place.y - geometry.sensors[i].place.y) ** 2)
-        num_ev = num_ev + temporal_expected_value(psuccess=geometry.sensors[i].psuccess, dpaoi=dpaoi, dps=dps,
-                                                  sigma=geometry.sensors[i].probabilistic_characterization.sigma,
-                                                  measures=measures[i])
-        den_ev = den_ev + temporal_expected_value(psuccess=geometry.sensors[i].psuccess, dpaoi=1, dps=1,
-                                                  sigma=geometry.sensors[i].probabilistic_characterization.sigma,
-                                                  measures=[1] * len(measures[i]))
-    return (num_ev / den_ev) / (dpaoi ** 2)
+        if temporal:
+            if isinstance(measures[i], list) is False:
+                raise ValueError("In temporal mode, each measure should be a list of length N (number of time steps).")
 
 
-def expected_radiations(measures, geometry: Geometry):
-    num_sensors = len(geometry.sensors)
-    num_ev = 0
-    den_ev = 0
-    dpaoi = np.sqrt((geometry.process.place.x - geometry.aoi.places[0].x) ** 2 + (
-            geometry.process.place.y - geometry.aoi.places[0].y) ** 2)
-    for i in range(num_sensors):
-        dps = np.sqrt((geometry.process.place.x - geometry.sensors[i].place.x) ** 2 + (
-                geometry.process.place.y - geometry.sensors[i].place.y) ** 2)
-        num_ev = num_ev + expected_value(psuccess=geometry.sensors[i].psuccess, dpaoi=dpaoi, dps=dps,
-                                         sigma=geometry.sensors[i].probabilistic_characterization.sigma,
-                                         measure=measures[i])
-        den_ev = den_ev + expected_value(psuccess=geometry.sensors[i].psuccess, dpaoi=1, dps=1,
-                                         sigma=geometry.sensors[i].probabilistic_characterization.sigma,
-                                         measure=1)
+        else:
+            if isinstance(measures[i], (int, float)) is False:
+                raise ValueError("In non-temporal mode, each measure should be a scalar value.")
+        num_ev = num_ev + f[temporal](psuccess=geometry.sensors[i].psuccess, dpaoi=dpaoi, dps=dps,
+                                      sigma=geometry.sensors[i].probabilistic_characterization.sigma,
+                                      measure=measures[i])
+        # normalization factor
+        den_ev = den_ev + f[temporal](psuccess=geometry.sensors[i].psuccess, dpaoi=1, dps=1,
+                                      sigma=geometry.sensors[i].probabilistic_characterization.sigma,
+                                      measure=1 if not temporal else [1] * len(measures[i]))
+
     return (num_ev / den_ev) / (dpaoi ** 2)
 
 
@@ -125,8 +119,8 @@ if __name__ == '__main__':
                               spike_range=np.linspace(0,
                                                       70))
     # RandomWalkProcess(ProbabilisticCharacterization(2, 5), 10000, drift=0)
-    s1: Sensor = Sensor(Place(1, 2), ProbabilisticCharacterization(0, 0.3))
-    s2: Sensor = Sensor(Place(1, -2), ProbabilisticCharacterization(0, 0.05))
+    s1: Sensor = Sensor(Place(1, 2), ProbabilisticCharacterization(0, 0.8))  # Best Places for Assessment
+    s2: Sensor = Sensor(Place(1, -2), ProbabilisticCharacterization(0, 0.9))  # Best Places for Assessment
     a: AreaOfInterest = AreaOfInterest([Place(5, 0)])
 
     geometry = Geometry(p, [s1, s2], a)
@@ -186,4 +180,4 @@ if __name__ == '__main__':
     plt.show()
 
     # print(expected_radiations([20.40, 19.999], geometry))
-    print(temporal_expected_radiations([s1s, s2s], geometry))
+    print(expected_radiations([s1s, s2s], geometry, temporal=True))
