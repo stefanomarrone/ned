@@ -104,7 +104,7 @@ def expected_radiations(measures, geometry: Geometry, poi: Place, temporal=False
     return (num_ev / den_ev) / (dpaoi ** 2)
 
 
-def run_simulation(geometry: Geometry, num_steps):
+def run_simulation(geometry: Geometry, num_steps, vals=None):
     process = []
 
     sensors = geometry.sensors
@@ -113,9 +113,14 @@ def run_simulation(geometry: Geometry, num_steps):
     measures = {idx: [] for idx in range(len(sensors))}
     aois = {idx: [] for idx in range(len(aoi_places))}
     reconstructions = {idx: [] for idx in range(len(aoi_places))}
+    if vals is not None:
+        num_steps = len(vals)
 
     for i in range(num_steps):
-        v = geometry.process.generate()
+        if vals is None:
+            v = geometry.process.generate()
+        else:
+            v = vals[i]
         process.append(v)
         for idx, s in enumerate(sensors):
             measures[idx].append(
