@@ -126,12 +126,13 @@ def temporal_expected_value(psuccess, dpaoi, dps, sigma, measure, decay=0.5):
     return tev
 
 
-def expected_radiations(measures, geometry: Geometry, temporal=False):
+def expected_radiations(measures, geometry: Geometry, poi: Place, temporal=False):
+    # An Area Of Interest is composed of several Points Of Interest!!!
     num_sensors = len(geometry.sensors)
     num_ev = 0
     den_ev = 0
-    dpaoi = np.sqrt((geometry.process.place.x - geometry.aoi.places[0].x) ** 2 + (
-            geometry.process.place.y - geometry.aoi.places[0].y) ** 2)
+    dpaoi = np.sqrt((geometry.process.place.x - poi.x) ** 2 + (
+            geometry.process.place.y - poi.y) ** 2)
     f = {True: temporal_expected_value, False: expected_value}
 
     for i in range(num_sensors):
@@ -140,7 +141,6 @@ def expected_radiations(measures, geometry: Geometry, temporal=False):
         if temporal:
             if isinstance(measures[i], list) is False:
                 raise ValueError("In temporal mode, each measure should be a list of length N (number of time steps).")
-
 
         else:
             if isinstance(measures[i], (int, float)) is False:
@@ -156,23 +156,39 @@ def expected_radiations(measures, geometry: Geometry, temporal=False):
     return (num_ev / den_ev) / (dpaoi ** 2)
 
 
+def run_simulation(geometry: Geometry, num_steps):
+    process = []
+
+    sensors = geometry.sensors
+    aoi_places = geometry.aoi.places
+
+    measures = {idx: [] for idx in range(len(sensors))}
+    aois = {idx: [] for idx in range(len(aoi_places))}
+    reconstructions = {idx: [] for idx in range(len(aoi_places))}
+
+    for i in range(num_steps):
+        v = geometry.process.generate()
+        process.append(v)
+        for idx, s in enumerate(sensors):
+            measures[idx].append(
+                transport_formula(v, s.probabilistic_characterization, geometry.process.place, s.place))
+        for idx, place in enumerate(aoi_places):
+            aois[idx].append(transport_formula(v, None, geometry.process.place, place))
+            reconstructions[idx].append(expected_radiations(list(measures.values()), geometry, place, temporal=True))
+    return process, measures, aois, reconstructions
+
+
 if __name__ == '__main__':
     p: Process = SpikeProcess(ProbabilisticCharacterization(0, 0.02), 100, spike_rate=0.07,
-                              spike_range=np.linspace(0,
-                                                      70))
+                              spike_range=np.linspace(0, 70))
     # RandomWalkProcess(ProbabilisticCharacterization(2, 5), 10000, drift=0)
     s1: Sensor = Sensor(Place(1, 2), ProbabilisticCharacterization(0, 0.8))  # Best Places for Assessment
     s2: Sensor = Sensor(Place(1, -2), ProbabilisticCharacterization(0, 0.9))  # Best Places for Assessment
-    a: AreaOfInterest = AreaOfInterest([Place(5, 0)])
+    s3: Sensor = Sensor(Place(-3, 0), ProbabilisticCharacterization(0, 0.9))  # Best Places for Assessment
+    a: AreaOfInterest = AreaOfInterest([Place(5, 0), Place(2, 3)])
 
-    geometry = Geometry(p, [s1, s2], a)
+    geometry = Geometry(p, [s1, s2, s3], a)
     geometry.draw_geometry()
-    ps = []
-    s1s = []
-    s2s = []
-    ass = []
-    alerts = []
-    ers = []
 
     # custom threshold for activation
     threshold = 130
@@ -181,45 +197,35 @@ if __name__ == '__main__':
     # plt.plot(ps)
     # plt.show()
     # generating process for 100 values and reading data
-    for i in range(100):
-        v = p.generate()
-        ps.append(v)
-        s1s.append(transport_formula(v, s1.probabilistic_characterization, p.place, s1.place))
-        s2s.append(transport_formula(v, s2.probabilistic_characterization, p.place, s2.place))
-        ass.append(transport_formula(v, None, p.place, a.places[0]))
-        if v > threshold:
-            alerts.append(1)
-        else:
-            alerts.append(0)
-        ers.append(expected_radiations([s1s[-1], s2s[-1]], geometry))
-
-    fig, axs = plt.subplots(2, 2, figsize=(10, 8))
-
-    # Plot ps on the first subplot
-    axs[0, 0].plot(ps)
-    axs[0, 0].set_title('process')
-
-    # Plot s1s on the second subplot
-    axs[0, 1].plot(s1s)
-    axs[0, 1].set_title('sensor1')
-
-    # Plot s2s on the third subplot
-    axs[1, 0].plot(s2s)
-    axs[1, 0].set_title('sensor2')
-
-    # Plot ass on the fourth subplot
-    axs[1, 1].plot(ass)
-    axs[1, 1].set_title('AreaOfInterest')
-
-    # Add some padding between subplots
-    plt.tight_layout()
-
-    # Display the plots
-    plt.show()
-
+    process, measures, aois, recs = run_simulation(geometry, 20)
     plt.figure(figsize=(20, 6))
-    plt.plot(ers)
+    plt.plot(process)
+    plt.title('process')
     plt.show()
 
-    # print(expected_radiations([20.40, 19.999], geometry))
-    print(expected_radiations([s1s, s2s], geometry, temporal=True))
+    num_measures = len(measures)
+    print(num_measures)
+    fig, axs = plt.subplots(num_measures, 1, figsize=(20, 6))
+    for i in range(num_measures):
+        try:
+            axs[i].plot(measures[i])
+            axs[i].set_title(f'sensor {i}')
+        except TypeError as e:
+            axs.plot(measures)
+            axs.set_title('sensor')
+    plt.show()
+
+    num_aoi = len(aois)  # num recs and num aoi is the same because for each aoi i have a reconstruction
+    fig, axs = plt.subplots(num_aoi, 2, figsize=(20, 6))
+    for i in range(num_aoi):
+        try:
+            axs[i, 0].plot(aois[i])
+            axs[i, 0].set_title(f'Point Of Interest {i}')
+            axs[i, 1].plot(recs[i])
+            axs[i, 1].set_title(f'Reconstruction Point Of Interest {i}')
+        except Exception as e:
+            axs[0].plot(aois[0])
+            axs[0].set_title('Point Of Interest')
+            axs[1].plot(recs[0])
+            axs[1].set_title('Reconstruction Point Of Interest')
+    plt.show()
