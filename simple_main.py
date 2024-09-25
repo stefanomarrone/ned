@@ -3,6 +3,7 @@ import numpy as np
 
 from AoI import AreaOfInterest
 from geometry import Geometry
+from main import analyse_simulation
 from process import Process, SpikeProcess
 from sensors import Sensor
 from simulation import run_simulation
@@ -14,13 +15,14 @@ if __name__ == '__main__':
     # RandomWalkProcess(ProbabilisticCharacterization(2, 5), 10000, drift=0)
     s1: Sensor = Sensor(Place(1, 2), ProbabilisticCharacterization(0, 0.3))  # Best Places for Assessment
     s2: Sensor = Sensor(Place(1, -2), ProbabilisticCharacterization(0, 0.05))  # Best Places for Assessment
-    s3: Sensor = Sensor(Place(1,0), ProbabilisticCharacterization(0,0.1))
+    # s3: Sensor = Sensor(Place(1,0), ProbabilisticCharacterization(0,0.1))
     a: AreaOfInterest = AreaOfInterest([Place(5, 0)])
-    geometry = Geometry(p, [s1, s2, s3], a)  # Geometry(p, [s1,s2,s3], a)
+    geometry = Geometry(p, [s1, s2], a)  # Geometry(p, [s1,s2,s3], a)
     geometry.draw_geometry()
 
     process, measures, aois, recs = run_simulation(geometry, 100)
 
+    print(analyse_simulation(aois, recs))
     plt.figure(figsize=(20, 6))
     plt.plot(process)
     plt.title('process')

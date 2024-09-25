@@ -64,7 +64,7 @@ def generate_table():
 
 
 def expected_value(psuccess, dpaoi, dps, sigma, measure):
-    return psuccess * (((dpaoi / (dps + dpaoi)) ** 2) * (1 / (sigma ** 2))) * measure
+    return psuccess * (((dpaoi / dps) ** 2) * (1 / (sigma ** 2))) * measure
 
 
 def temporal_expected_value(psuccess, dpaoi, dps, sigma, measure, decay=100):

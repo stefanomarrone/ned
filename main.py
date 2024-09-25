@@ -51,7 +51,7 @@ if __name__ == '__main__':
     process: Process = SpikeProcess(ProbabilisticCharacterization(0, 0.02), 100, spike_rate=0.07,
                                     spike_range=np.linspace(0, 70))
     AoI: AreaOfInterest = AreaOfInterest([Place(5, 0)])
-    num_steps = 20
+    num_steps = 300
     val_process = [process.generate() for i in range(num_steps)]
     all_measures = []
     all_aois = []
@@ -62,7 +62,7 @@ if __name__ == '__main__':
     plt.title('process')
     plt.show()
 
-    for i in range(100):
+    for i in range(100000):
         _, sensors, _ = generate_random_geometry()
         geometry = Geometry(process, sensors, AoI)  # Geometry(p, [s1,s2,s3], a)
         geometries.append(geometry)
@@ -81,6 +81,7 @@ if __name__ == '__main__':
             print('aaaa\n')
         # format_simulation(geometry, sim_res)
 
+    print(sim_res, len(sim_res))
     min_res = np.min(sim_res)
     min_pos = np.argmin(sim_res)
     # let's plot the min res configuration
