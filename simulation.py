@@ -64,14 +64,15 @@ def generate_table():
 
 
 def expected_value(psuccess, dpaoi, dps, sigma, measure):
-    return psuccess * (((dpaoi / dps) ** 2) * (1 / (sigma ** 2))) * measure
+    return psuccess * (((dpaoi / (dps + dpaoi)) ** 2) * (1 / (sigma ** 2))) * measure
 
 
-def temporal_expected_value(psuccess, dpaoi, dps, sigma, measure, decay=0.5):
-    tev = 0
-    for i in range(len(measure)):
-        tev = tev + np.exp(-decay * (len(measure) - i)) * expected_value(psuccess, dpaoi, dps, sigma, measure[i])
-    return tev
+def temporal_expected_value(psuccess, dpaoi, dps, sigma, measure, decay=100):
+    # tev = 0
+    # for i in range(len(measure)):
+    #    tev = tev + np.exp(-decay * ((len(measure)-1) - i)) * expected_value(psuccess, dpaoi, dps, sigma, measure[i])
+    # Fake temporal decay
+    return expected_value(psuccess, dpaoi, dps, sigma, measure[-1])
 
 
 def expected_radiations(measures, geometry: Geometry, poi: Place, temporal=False):

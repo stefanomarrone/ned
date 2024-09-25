@@ -12,15 +12,14 @@ if __name__ == '__main__':
     p: Process = SpikeProcess(ProbabilisticCharacterization(0, 0.02), 100, spike_rate=0.07,
                               spike_range=np.linspace(0, 70))
     # RandomWalkProcess(ProbabilisticCharacterization(2, 5), 10000, drift=0)
-    s1: Sensor = Sensor(Place(1,2), ProbabilisticCharacterization(0, 0.8))  # Best Places for Assessment
-    s2: Sensor = Sensor(Place(1,-2), ProbabilisticCharacterization(0, 0.9))  # Best Places for Assessment
-    s3: Sensor = Sensor(Place(-3,0), ProbabilisticCharacterization(0,0.1))
+    s1: Sensor = Sensor(Place(1, 2), ProbabilisticCharacterization(0, 0.3))  # Best Places for Assessment
+    s2: Sensor = Sensor(Place(1, -2), ProbabilisticCharacterization(0, 0.05))  # Best Places for Assessment
+    s3: Sensor = Sensor(Place(1,0), ProbabilisticCharacterization(0,0.1))
     a: AreaOfInterest = AreaOfInterest([Place(5, 0)])
     geometry = Geometry(p, [s1, s2, s3], a)  # Geometry(p, [s1,s2,s3], a)
     geometry.draw_geometry()
 
-    process, measures, aois, recs = run_simulation(geometry, 20)
-
+    process, measures, aois, recs = run_simulation(geometry, 100)
 
     plt.figure(figsize=(20, 6))
     plt.plot(process)
@@ -28,7 +27,6 @@ if __name__ == '__main__':
     plt.show()
 
     num_measures = len(measures)
-    print(num_measures)
     fig, axs = plt.subplots(num_measures, 1, figsize=(20, 6))
     for i in range(num_measures):
         try:
