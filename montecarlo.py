@@ -45,6 +45,48 @@ class Geometry:
         self.sensors = sensors
         self.aoi = aoi
 
+    def draw_geometry(self):
+        grid_size = 11  # fixed size for draw simplicity
+        half_grid = (grid_size - 1) // 2  # This will help place (0,0) in the center
+
+        def convert_to_grid_coords(x, y):
+            # Shift the coordinates to place (0,0) in the center of the grid
+            grid_x = int(x + half_grid)
+            grid_y = int(y + half_grid)
+            return grid_x, grid_y
+
+        # Create a grid and set all to white initially
+        grid = np.ones((grid_size, grid_size, 3))  # NxN pixels with RGB channels
+
+        # Set Area of Interest to green
+        for aoi in self.aoi.places:
+            grid_x_aoi, grid_y_aoi = convert_to_grid_coords(aoi.x, aoi.y)
+            grid[grid_size - grid_y_aoi - 1, grid_x_aoi] = [0, 1, 0]  # RGB for green
+
+        # Set Process to red
+        grid_x_process, grid_y_process = convert_to_grid_coords(self.process.place.x, self.process.place.y)
+        grid[grid_size - grid_y_process - 1, grid_x_process] = [1, 0, 0]  # RGB for red
+
+        # Set Sensors to grey
+        for s in self.sensors:
+            grid_x_sensor, grid_y_sensor = convert_to_grid_coords(s.place.x, s.place.y)
+            grid[grid_size - grid_y_sensor - 1, grid_x_sensor] = [0.5, 0.5, 0.5]  # RGB for grey
+
+        # Plot the grid
+        plt.imshow(grid, extent=(-half_grid, half_grid, -half_grid, half_grid))
+        plt.grid(True)
+
+        # Add x and y axis labels
+        plt.xlabel("x")
+        plt.ylabel("y")
+
+        # Show x and y ticks at regular intervals
+        plt.xticks(np.arange(-half_grid, half_grid + 1, 1))
+        plt.yticks(np.arange(-half_grid, half_grid + 1, 1))
+
+        plt.title('Geometry Map')
+        plt.show()
+
 
 def transport_formula(p_val, probabilistic_characterization: Union[ProbabilisticCharacterization, None], p_place: Place,
                       v_place: Place):
@@ -124,7 +166,7 @@ if __name__ == '__main__':
     a: AreaOfInterest = AreaOfInterest([Place(5, 0)])
 
     geometry = Geometry(p, [s1, s2], a)
-
+    geometry.draw_geometry()
     ps = []
     s1s = []
     s2s = []
@@ -155,19 +197,19 @@ if __name__ == '__main__':
 
     # Plot ps on the first subplot
     axs[0, 0].plot(ps)
-    axs[0, 0].set_title('ps')
+    axs[0, 0].set_title('process')
 
     # Plot s1s on the second subplot
     axs[0, 1].plot(s1s)
-    axs[0, 1].set_title('s1s')
+    axs[0, 1].set_title('sensor1')
 
     # Plot s2s on the third subplot
     axs[1, 0].plot(s2s)
-    axs[1, 0].set_title('s2s')
+    axs[1, 0].set_title('sensor2')
 
     # Plot ass on the fourth subplot
     axs[1, 1].plot(ass)
-    axs[1, 1].set_title('ass')
+    axs[1, 1].set_title('AreaOfInterest')
 
     # Add some padding between subplots
     plt.tight_layout()
