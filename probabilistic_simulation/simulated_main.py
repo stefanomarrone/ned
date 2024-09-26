@@ -7,27 +7,8 @@ from AoI import AreaOfInterest
 from geometry import Geometry
 from simulation import run_simulation, analyse_simulation
 from process import Process, SpikeProcess
-from sensors import Sensor
 from utils import ProbabilisticCharacterization, Place
 import matplotlib.pyplot as plt
-
-
-def generate_random_geometry():
-    num_sensors = 2
-    sensors_place_range = np.linspace(-5, 5)
-    # sensors_sigma_range = np.linspace(0, 1)
-
-    p: Process = SpikeProcess(ProbabilisticCharacterization(0, 0.02), 100, spike_rate=0.07,
-                              spike_range=np.linspace(0, 70))
-
-    sensors = [Sensor(
-        Place(random.choice(sensors_place_range), random.choice(sensors_place_range)),
-        ProbabilisticCharacterization(0, 0.05)
-    ) for _ in range(num_sensors)]
-
-    a: AreaOfInterest = AreaOfInterest([Place(5, 0)])
-
-    return p, sensors, a
 
 
 def format_simulation(geometry: Geometry, sim_res):
@@ -56,8 +37,11 @@ if __name__ == '__main__':
     plt.show()
 
     for i in range(100000):
-        _, sensors, _ = generate_random_geometry()
-        geometry = Geometry(process, sensors, AoI)  # Geometry(p, [s1,s2,s3], a)
+        geometry = Geometry.generate_random_geometry(process, num_sensors=3,
+                                                     poi=[Place(0, 5)])  # Geometry(p, [s1,s2,s3], a)
+        # instancing sensors characterization
+        for i in range(geometry.sensors):
+            geometry.sensors[i].probabilistic_characterization = ProbabilisticCharacterization(0, 0.05)
         geometries.append(geometry)
         # geometry.draw_geometry()
         try:

@@ -1,10 +1,12 @@
-from typing import List
+import random
+from typing import List, Union
 
 from AoI import AreaOfInterest
 from process import Process
 from sensors import Sensor
 import matplotlib.pyplot as plt
 import numpy as np
+from utils import Place
 
 
 class Geometry:
@@ -54,3 +56,24 @@ class Geometry:
 
         plt.title('Geometry Map')
         plt.show()
+
+    @staticmethod
+    def generate_random_geometry(processType: Process, num_sensors, num_poi: Union[int, None] = None,
+                                 poi: Union[List[Place], None] = None):
+        sensors_place_range = np.linspace(-5, 5)
+
+        p: Process = processType
+
+        sensors = [Sensor(
+            Place(random.choice(sensors_place_range), random.choice(sensors_place_range)),
+            None
+        ) for _ in range(num_sensors)]
+        if poi is None:
+            a: AreaOfInterest = AreaOfInterest([
+                Place(random.choice(sensors_place_range), random.choice(sensors_place_range))
+                for _ in range(num_poi)
+            ])
+        else:
+            a: AreaOfInterest = AreaOfInterest(poi)
+
+        return Geometry(process=p, sensors=sensors, aoi=a)

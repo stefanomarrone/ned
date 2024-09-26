@@ -1,3 +1,5 @@
+from typing import Union
+
 from utils import Place, ProbabilisticCharacterization
 
 
@@ -7,11 +9,11 @@ class Scheduler:
 
 
 class Sensor:
-    def __init__(self, place: Place, probabilistic_characterization: ProbabilisticCharacterization,
+    def __init__(self, place: Place, probabilistic_characterization: Union[ProbabilisticCharacterization, None],
                  battery_capacity=1220, psuccess=1):
         self.place: Place = place
         # a good sensor can have a pc like mu = 0, std = 2
-        self.probabilistic_characterization = probabilistic_characterization
+        self.probabilistic_characterization: Union[ProbabilisticCharacterization, None] = probabilistic_characterization
         self.battery_capacity = battery_capacity
         # For now we don't have a scheduler and battery class for the sensor,
         # so the probability of success  is given outside
