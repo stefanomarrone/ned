@@ -28,39 +28,11 @@
 
     21/09/2024  michele.digiovanni@unicampania.it
 """
-from typing import Union
 
 import numpy as np
 
 from geometry import Geometry
-from utils import ProbabilisticCharacterization, Place
-
-
-def transport_formula(p_val, probabilistic_characterization: Union[ProbabilisticCharacterization, None], p_place: Place,
-                      v_place: Place):
-    val = p_val / ((p_place.x - v_place.x) ** 2 + (p_place.y - v_place.y) ** 2)
-    if probabilistic_characterization is not None:
-        e = np.random.normal(probabilistic_characterization.mu, probabilistic_characterization.sigma)
-        val = val + e
-    return val
-
-
-# @TODO: full Monte Carlo implementation and table creation
-def generate_table():
-    pass
-
-
-"""
-    measures should have N lists, where N is the number of sensors from geometry
-    
-    measures = [
-        [1,2,3...],
-        [3,5,6,..],
-        ...,
-        [4,5,6,...]
-    ]
-    
-"""
+from utils import Place, transport_formula
 
 
 def expected_value(psuccess, dpaoi, dps, sigma, measure):
@@ -105,9 +77,15 @@ def expected_radiations(measures, geometry: Geometry, poi: Place, temporal=False
     return (num_ev / den_ev) / (dpaoi ** 2)
 
 
+def analyse_simulation(aois, recs):
+    aois_rmse = []
+    for i in range(len(aois)):
+        aois_rmse.append(np.sqrt(np.mean((np.array(aois[i]) - np.array(recs[i])) ** 2)))
+    return aois_rmse
+
+
 def run_simulation(geometry: Geometry, num_steps, vals=None):
     process = []
-
     sensors = geometry.sensors
     aoi_places = geometry.aoi.places
 

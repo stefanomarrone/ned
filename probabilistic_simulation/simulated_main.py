@@ -5,18 +5,11 @@ import numpy as np
 
 from AoI import AreaOfInterest
 from geometry import Geometry
-from simulation import run_simulation
+from simulation import run_simulation, analyse_simulation
 from process import Process, SpikeProcess
 from sensors import Sensor
 from utils import ProbabilisticCharacterization, Place
 import matplotlib.pyplot as plt
-
-
-def analyse_simulation(aois, recs):
-    aois_rmse = []
-    for i in range(len(aois)):
-        aois_rmse.append(np.sqrt(np.mean((np.array(aois[i]) - np.array(recs[i])) ** 2)))
-    return aois_rmse
 
 
 def generate_random_geometry():

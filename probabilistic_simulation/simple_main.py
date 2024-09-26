@@ -3,10 +3,9 @@ import numpy as np
 
 from AoI import AreaOfInterest
 from geometry import Geometry
-from main import analyse_simulation
 from process import Process, SpikeProcess
 from sensors import Sensor
-from simulation import run_simulation
+from simulation import run_simulation, analyse_simulation
 from utils import ProbabilisticCharacterization, Place
 
 if __name__ == '__main__':
