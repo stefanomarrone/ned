@@ -40,8 +40,10 @@ if __name__ == '__main__':
         geometry = Geometry.generate_random_geometry(process, num_sensors=3,
                                                      poi=[Place(0, 5)])  # Geometry(p, [s1,s2,s3], a)
         # instancing sensors characterization
-        for i in range(geometry.sensors):
-            geometry.sensors[i].probabilistic_characterization = ProbabilisticCharacterization(0, 0.05)
+        for idx, _ in enumerate(geometry.sensors):
+            geometry.sensors[idx].probabilistic_characterization = ProbabilisticCharacterization(0, random.uniform(0.05,
+                                                                                                                   0.9))
+
         geometries.append(geometry)
         # geometry.draw_geometry()
         try:
