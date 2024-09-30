@@ -1,6 +1,6 @@
 from typing import Union
-
 import numpy as np
+import pandas as pd
 
 
 class Place:
@@ -29,7 +29,18 @@ def transport_formula(p_val, probabilistic_characterization: Union[Probabilistic
     return val
 
 
-# @TODO: full Monte Carlo implementation and table creation
-def generate_table():
-    pass
-
+def generate_table(val_sensors, val_pois):
+    t = []
+    title = [f'sensor {idx}' for idx, _ in enumerate(val_sensors)]
+    title.extend([f'Poi {idx}' for idx, _ in enumerate(val_pois)])
+    num_sensors, num_pois = len(val_sensors), len(val_pois)
+    num_vals = len(val_sensors[0])
+    for j in range(num_vals):
+        vec = [val_sensors[i][j] for i in range(num_sensors)]
+        vec.extend([val_pois[i][j] for i in range(num_pois)])
+        vec = np.array(vec)
+        t.append(vec)
+    t = np.array(t)
+    table = pd.DataFrame(t)
+    table.columns = title
+    return table
