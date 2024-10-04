@@ -4,11 +4,11 @@ from typing import List
 import matplotlib.pyplot as plt
 import numpy as np
 
-from AoI import AreaOfInterest
-from geometry import Geometry
-from process import Process, SpikeProcess
-from sensors import Sensor
-from utils import ProbabilisticCharacterization, Place, transport_formula, generate_table
+from domain.areaofinterest import AreaOfInterest
+from domain.geometry import Geometry
+from domain.process import Process, SpikeProcess
+from domain.sensors import Sensor
+from domain.utils import ProbabilisticCharacterization, Place, transport_formula, generate_table
 
 
 def run_simulation(geometry: Geometry, num_steps, vals=None):

@@ -2,7 +2,7 @@ from random import random, choice
 
 import numpy as np
 
-from utils import Place, ProbabilisticCharacterization
+from domain.utils import Place, ProbabilisticCharacterization
 
 
 class Process:

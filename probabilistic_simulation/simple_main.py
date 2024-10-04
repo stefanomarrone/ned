@@ -1,12 +1,12 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
-from AoI import AreaOfInterest
-from geometry import Geometry
-from process import Process, SpikeProcess
-from sensors import Sensor
+from domain.areaofinterest import AreaOfInterest
+from domain.geometry import Geometry
+from domain.process import Process, SpikeProcess
+from domain.sensors import Sensor
 from simulation import run_simulation, analyse_simulation
-from utils import ProbabilisticCharacterization, Place
+from domain.utils import ProbabilisticCharacterization, Place
 
 if __name__ == '__main__':
     p: Process = SpikeProcess(ProbabilisticCharacterization(0, 0.02), 100, spike_rate=0.07,

@@ -3,11 +3,11 @@ from typing import List
 
 import numpy as np
 
-from AoI import AreaOfInterest
-from geometry import Geometry
+from domain.areaofinterest import AreaOfInterest
+from domain.geometry import Geometry
 from simulation import run_simulation, analyse_simulation
-from process import Process, SpikeProcess
-from utils import ProbabilisticCharacterization, Place
+from domain.process import Process, SpikeProcess
+from domain.utils import ProbabilisticCharacterization, Place
 import matplotlib.pyplot as plt
 
 

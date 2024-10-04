@@ -1,12 +1,12 @@
 import random
 from typing import List, Union
 
-from AoI import AreaOfInterest
-from process import Process
-from sensors import Sensor
+from domain.areaofinterest import AreaOfInterest
+from domain.process import Process
+from domain.sensors import Sensor
 import matplotlib.pyplot as plt
 import numpy as np
-from utils import Place
+from domain.utils import Place
 
 
 class Geometry:

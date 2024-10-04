@@ -31,8 +31,8 @@
 
 import numpy as np
 
-from geometry import Geometry
-from utils import Place, transport_formula
+from domain.geometry import Geometry
+from domain.utils import Place, transport_formula
 
 
 def expected_value(psuccess, dpaoi, dps, sigma, measure):

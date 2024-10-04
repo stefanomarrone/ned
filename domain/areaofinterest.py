@@ -1,6 +1,6 @@
 from typing import List, Union
 
-from utils import Place, SafetyMethod
+from domain.utils import Place, SafetyMethod
 
 
 class AreaOfInterest:

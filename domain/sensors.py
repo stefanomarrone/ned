@@ -1,6 +1,6 @@
 from typing import Union
 
-from utils import Place, ProbabilisticCharacterization
+from domain.utils import Place, ProbabilisticCharacterization
 
 
 class Scheduler:
