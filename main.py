@@ -1,3 +1,4 @@
+import sys
 from random import uniform
 from typing import List
 
@@ -9,6 +10,7 @@ from domain.geometry import Geometry
 from domain.process import Process, SpikeProcess
 from domain.sensors import Sensor
 from domain.utils import ProbabilisticCharacterization, Place, transport_formula, generate_table
+from utils.configuration import Configuration
 
 
 def run_simulation(geometry: Geometry, num_steps, vals=None):
@@ -39,7 +41,7 @@ def poi_thr(val, d):
     return val / d
 
 
-if __name__ == '__main__':
+def main_run():
     process: Process = SpikeProcess(ProbabilisticCharacterization(0, 0.02), 100, spike_rate=0.07,
                                     spike_range=np.linspace(0, 70))
     poi: List[Place] = [Place(5, 0)]  # , Place(-5, 0), Place(0, 5), Place(0, -5)]
@@ -47,19 +49,14 @@ if __name__ == '__main__':
     geometry = Geometry(process, sensors, AreaOfInterest(places=poi))
     # geometry = Geometry.generate_random_geometry(process, num_sensors=3, poi=poi)
     geometry.draw_geometry()
-
     for idx, _ in enumerate(geometry.sensors):
         geometry.sensors[idx].probabilistic_characterization = ProbabilisticCharacterization(0, uniform(0.05, 1.2))
-
     process, measures, aois = run_simulation(geometry=geometry, num_steps=100)
-
     # print results
-
     plt.figure(figsize=(20, 6))
     plt.plot(process)
     plt.title('process')
     plt.show()
-
     num_measures = len(measures)
     fig, axs = plt.subplots(num_measures, 1, figsize=(20, 6))
     thr_measures = []
@@ -78,7 +75,6 @@ if __name__ == '__main__':
             axs.plot(range(len(measures[0])), [thr] * len(measures[0]))
             axs.set_title('sensor')
     plt.show()
-
     num_aoi = len(aois)  # num recs and num aoi is the same because for each aoi i have a reconstruction
     fig, axs = plt.subplots(num_aoi, 1, figsize=(20, 6))
     # setting thresholds for AoI and sensors
@@ -98,33 +94,31 @@ if __name__ == '__main__':
             axs.plot(range(len(aois[0])), [thr] * len(aois[0]))
             axs.set_title('Point Of Interest')
     plt.show()
-
-
     # plots for the paper
     fig, axs = plt.subplots(2, 2, figsize=(10, 8))
-
     # Plot ps on the first subplot
     axs[0, 0].plot(process)
     axs[0, 0].set_title('process')
-
     # Plot s1s on the second subplot
     axs[0, 1].plot(measures[0])
     axs[0, 1].plot(range(len(measures[0])), [thr_y[0]] * len(measures[0]))
     axs[0, 1].set_title('sensor 1')
-
     # Plot s2s on the third subplot
     axs[1, 0].plot(measures[1])
     axs[1, 0].plot(range(len(measures[1])), [thr_y[1]] * len(measures[1]))
     axs[1, 0].set_title('sensor 2')
-
     # Plot ass on the fourth subplot
     axs[1, 1].plot(aois[0])
     axs[1, 1].plot(range(len(aois[i])), [thr] * len(aois[i]))
     axs[1, 1].set_title('Area of Interest')
-
     # Add some padding between subplots
     plt.tight_layout()
-
     # Display the plots
     plt.show()
     print(generate_table(thr_measures, thr_aois))
+
+
+if __name__ == '__main__':
+    configuration_filename = sys.argv[1]
+    config = Configuration(configuration_filename)
+    main_run()
