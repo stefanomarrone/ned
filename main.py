@@ -4,19 +4,21 @@ from typing import List
 
 import matplotlib.pyplot as plt
 import numpy as np
+from sympy.codegen import aug_assign
 
 from domain.areaofinterest import AreaOfInterest
 from domain.geometry import Geometry
 from domain.process import Process, SpikeProcess
 from domain.sensors import Sensor
-from domain.utils import ProbabilisticCharacterization, Place, transport_formula, generate_table
+from domain.utils import ProbabilisticCharacterization, Place, transport_formula, generate_table, Asset
+from factory.process import ProcessFactoryRegistry
 from utils.configuration import Configuration
 
 
 def run_simulation(geometry: Geometry, num_steps, vals=None):
     process = []
     sensors = geometry.sensors
-    aoi_places = geometry.aoi.places
+    aoi_places = geometry.aoi
 
     measures = {idx: [] for idx in range(len(sensors))}
     aois = {idx: [] for idx in range(len(aoi_places))}
@@ -42,12 +44,13 @@ def poi_thr(val, d):
 
 
 def main_run():
+
     process: Process = SpikeProcess(ProbabilisticCharacterization(0, 0.02), 100, spike_rate=0.07,
                                     spike_range=np.linspace(0, 70))
     poi: List[Place] = [Place(5, 0)]  # , Place(-5, 0), Place(0, 5), Place(0, -5)]
     sensors: List[Sensor] = [Sensor(Place(1, 2), None, psuccess=0.8), Sensor(Place(1, -2), None, psuccess=0.8)]
+
     geometry = Geometry(process, sensors, AreaOfInterest(places=poi))
-    # geometry = Geometry.generate_random_geometry(process, num_sensors=3, poi=poi)
     geometry.draw_geometry()
     for idx, _ in enumerate(geometry.sensors):
         geometry.sensors[idx].probabilistic_characterization = ProbabilisticCharacterization(0, uniform(0.05, 1.2))
@@ -117,10 +120,38 @@ def main_run():
     plt.show()
     print(generate_table(thr_measures, thr_aois))
 
+def build(configuration):
+    # Process setting
+    process_info = configuration.get('process')
+    process_kind = process_info['kind']
+    process_factory = ProcessFactoryRegistry.getFactory(process_kind)
+    process = process_factory.generate(process_info)
+    # Asset setting
+    asset_threshold = configuration.get('hazardlevel')
+    asset_x, asset_y = configuration.get('asset')
+    asset = Asset(asset_x, asset_y, asset_threshold)
+    # Sensors setting
+    sensors = configuration.get('sensors')
+    sensors = list(map(lambda x: Sensor(x, configuration.get(x)), sensors))
+    # geometry
+    geometry = Geometry(process, sensors, [asset])
+    return geometry
+
+
+
+def core(configuration_filename, draw_flag):
+    config = Configuration(configuration_filename)
+    geometry = build(config)
+    if draw_flag:
+        geometry.draw_geometry()
+    number_of_steps = config.get('simulation_steps')
+    process, measures, aois = run_simulation(geometry=geometry, num_steps=number_of_steps)
+    pass
+
 
 if __name__ == '__main__':
-    configuration_filename = sys.argv[1]
-    config = Configuration(configuration_filename)
-    pass
-#    main_run()
+    if len(sys.argv) >= 2:
+        configuration_filename = sys.argv[1]
+        drawing_flag = (len(sys.argv) > 2) and (sys.argv.__contains__('--draw'))
+        core(configuration_filename, drawing_flag)
 

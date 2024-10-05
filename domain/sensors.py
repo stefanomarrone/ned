@@ -9,12 +9,14 @@ class Scheduler:
 
 
 class Sensor:
-    def __init__(self, place: Place, probabilistic_characterization: Union[ProbabilisticCharacterization, None],
-                 battery_capacity=1220, psuccess=1):
-        self.place: Place = place
-        # a good sensor can have a pc like mu = 0, std = 2
-        self.probabilistic_characterization: Union[ProbabilisticCharacterization, None] = probabilistic_characterization
-        self.battery_capacity = battery_capacity
+    def __init__(self, name, parameters):
+        x, y = parameters.get('position')
+        threshold = parameters.get('threshold')
+        mu = parameters.get('mu')
+        sigma = parameters.get('sigma')
+        self.place: Place = Place(x, y)
+        self.probabilistic_characterization: Union[ProbabilisticCharacterization, None] = ProbabilisticCharacterization(mu, sigma)
+        self.name = name
+        self.threshold = threshold
         # For now we don't have a scheduler and battery class for the sensor,
         # so the probability of success  is given outside
-        self.psuccess = psuccess

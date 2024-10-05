@@ -10,6 +10,10 @@ class Place:
         self.x = x
         self.y = y
 
+class Asset(Place):
+    def __init__(self, x, y, th):
+        super().__init__(x,y)
+        self.threshold = th
 
 class ProbabilisticCharacterization:
     def __init__(self, mu, sigma):

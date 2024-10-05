@@ -16,7 +16,7 @@ class Geometry:
         self.aoi = aoi
 
     def draw_geometry(self):
-        grid_size = 11  # fixed size for draw simplicity
+        grid_size = 21  # fixed size for draw simplicity
         half_grid = (grid_size - 1) // 2  # This will help place (0,0) in the center
 
         def convert_to_grid_coords(x, y):
@@ -29,7 +29,7 @@ class Geometry:
         grid = np.ones((grid_size, grid_size, 3))  # NxN pixels with RGB channels
 
         # Set Area of Interest to green
-        for aoi in self.aoi.places:
+        for aoi in self.aoi:
             grid_x_aoi, grid_y_aoi = convert_to_grid_coords(aoi.x, aoi.y)
             grid[grid_size - grid_y_aoi - 1, grid_x_aoi] = [0, 1, 0]  # RGB for green
 
@@ -40,7 +40,7 @@ class Geometry:
         # Set Sensors to grey
         for s in self.sensors:
             grid_x_sensor, grid_y_sensor = convert_to_grid_coords(s.place.x, s.place.y)
-            grid[grid_size - grid_y_sensor - 1, grid_x_sensor] = [0.5, 0.5, 0.5]  # RGB for grey
+            grid[grid_size - grid_y_sensor - 1, grid_x_sensor] = [0, 0, 1]  # RGB for blue
 
         # Plot the grid
         plt.imshow(grid, extent=(-half_grid, half_grid, -half_grid, half_grid))

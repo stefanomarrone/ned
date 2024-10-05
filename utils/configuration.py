@@ -3,9 +3,7 @@ from torchgen.packaged.autograd.gen_autograd_functions import process_function
 from utils.metaclasses import Singleton
 from configparser import ConfigParser
 import configparser
-import tempfile
 import io
-
 from utils.utils import tostring
 
 
@@ -14,7 +12,7 @@ from utils.utils import tostring
 class Configuration(metaclass=Singleton):
 
     process_registry = {
-        'spike': [('spikerate', float), ('mu', float), ('sigma', float), ('level', float)],
+        'spike': [('range', float), ('rate', float), ('mu', float), ('sigma', float), ('level', float)],
         'walk': [('drift', float), ('mu', float), ('sigma', float), ('level', float)]
     }
 
@@ -51,6 +49,8 @@ class Configuration(metaclass=Singleton):
         reader.read_file(inifile)
         try:
             # Main configuration
+            temp = int(reader['main']['simulation_steps'])
+            self.put('simulation_steps',temp)
             temp = float(reader['main']['hazardlevel'])
             self.put('hazardlevel',temp)
             temp = reader['main']['asset']
@@ -71,13 +71,15 @@ class Configuration(metaclass=Singleton):
                 temp = temp.split(',')
                 temp = tuple([float(i) for i in temp])
                 sensor_parameters['position'] = temp
+                temp = float(reader[sensor]['mu'])
+                sensor_parameters['mu'] = temp
                 temp = float(reader[sensor]['sigma'])
                 sensor_parameters['sigma'] = temp
                 self.put(sensor,sensor_parameters)
             # Process configuration
             process = reader['main']['process']
             process_elements = Configuration.process_registry[process]
-            dictionary = dict()
+            dictionary = {'kind': process}
             for element in process_elements:
                 process_key, process_function = element
                 value = reader[process][process_key]
@@ -91,10 +93,9 @@ class Configuration(metaclass=Singleton):
         reader = ConfigParser()
         reader.read(inifile)
         try:
-            temp = reader['main']['sensor_ini']
-            content += '\n' + tostring(temp)
-            temp = reader['main']['process_ini']
-            content += '\n\n' + tostring(temp)
+            includes = reader['main']['include'].split(',')
+            for include in includes:
+                content += '\n' + tostring(include)
         except Exception as s:
             print(s)
         return content
