@@ -121,4 +121,6 @@ def main_run():
 if __name__ == '__main__':
     configuration_filename = sys.argv[1]
     config = Configuration(configuration_filename)
-    main_run()
+    pass
+#    main_run()
+
