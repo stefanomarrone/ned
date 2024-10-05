@@ -15,7 +15,7 @@ class Geometry:
         self.sensors = sensors
         self.aoi = aoi
 
-    def draw_geometry(self):
+    def draw(self):
         grid_size = 21  # fixed size for draw simplicity
         half_grid = (grid_size - 1) // 2  # This will help place (0,0) in the center
 
