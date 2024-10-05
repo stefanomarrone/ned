@@ -67,7 +67,7 @@ if __name__ == '__main__':
     print(min_pos)
     print(format_simulation(geometries[min_pos], min_res))
     g: Geometry = geometries[min_pos]
-    g.draw_geometry()
+    g.draw()
     num_measures = len(all_measures[min_pos])
     fig, axs = plt.subplots(num_measures, 1, figsize=(20, 6))
     for i in range(num_measures):

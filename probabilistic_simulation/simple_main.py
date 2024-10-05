@@ -17,7 +17,7 @@ if __name__ == '__main__':
     # s3: Sensor = Sensor(Place(1,0), ProbabilisticCharacterization(0,0.1))
     a: AreaOfInterest = AreaOfInterest([Place(5, 0)])
     geometry = Geometry(p, [s1, s2], a)  # Geometry(p, [s1,s2,s3], a)
-    geometry.draw_geometry()
+    geometry.draw()
 
     process, measures, aois, recs = run_simulation(geometry, 100)
 
