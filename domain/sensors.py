@@ -20,3 +20,6 @@ class Sensor:
         self.threshold = threshold
         # For now we don't have a scheduler and battery class for the sensor,
         # so the probability of success  is given outside
+
+    def getName(self):
+        return self.name
