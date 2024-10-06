@@ -1,6 +1,6 @@
 import sys
 
-from bayes.inference import Network
+from bayes.bayesian import Network
 from domain.geometry import Geometry
 from domain.results import Results
 from domain.sensors import Sensor
@@ -52,15 +52,19 @@ def core(configuration_filename, draw_flag):
     config = Configuration(configuration_filename)
     geometry = build(config)
     number_of_steps = config.get('simulation_steps')
-    results = run_simulation(geometry=geometry, num_steps=number_of_steps)
-    table = results.get_detection_table()
-    network = Network(results.get_sensor_names())
-    network.build(table)
+    stop = False
+    while not stop:
+        results = run_simulation(geometry=geometry, num_steps=number_of_steps)
+        table = results.get_detection_table()
+        network = Network(results.get_sensor_names())
+        network.build(table)
+        analysis = network.analysis()
+        stop = bool(analysis)
+
     if draw_flag:
         out_folder = config.get('outfolder')
         geometry.draw(out_folder)
         results.draw(out_folder)
-    pass
 
 if __name__ == '__main__':
     if len(sys.argv) >= 2:

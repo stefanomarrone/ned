@@ -1,13 +1,9 @@
 from itertools import product
-import numpy as np
-import pandas as pd
-import matplotlib.pyplot as plt
 from pgmpy.models import BayesianNetwork
 from pgmpy.estimators import MaximumLikelihoodEstimator
 from pgmpy.inference import VariableElimination
-import networkx as nx
-from configparser import ConfigParser
-import sys
+from yt_dlp.utils import determine_ext
+
 
 class Network:
     def __init__(self, sensor_names):
@@ -18,11 +14,22 @@ class Network:
         couples = self.get_network_structure()
         self.model = BayesianNetwork(couples)
         self.model.fit(result_table, estimator=MaximumLikelihoodEstimator)
-        #todo: complete with network a posteriori inference
-        pass
-
 
     def get_network_structure(self):
         asset_names = ['asset']
         couples = list(product(self.sensor_names,asset_names))
         return couples
+
+    def analysis(self):
+        detection = {}
+        ve = VariableElimination(self.model)
+        try:
+            result = ve.query(variables=self.sensor_names, evidence={'asset': True}, joint=False)
+            for name in self.sensor_names:
+                distro = result[name]
+                index = distro.name_to_no[name][True]
+                probability = distro.values[index]
+                detection[name] = probability
+        except Exception as e:
+            pass
+        return detection
