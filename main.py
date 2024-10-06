@@ -2,8 +2,8 @@ import sys
 from domain.geometry import Geometry
 from domain.results import Results
 from domain.sensors import Sensor
-from domain.utils import transport_formula, generate_table, Asset
-from factory.process import ProcessFactoryRegistry
+from domain.utils import transport_formula, Asset
+from domain.factory import ProcessFactoryRegistry
 from utils.configuration import Configuration
 
 def run_simulation(geometry: Geometry, num_steps):
