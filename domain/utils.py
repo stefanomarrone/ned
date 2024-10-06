@@ -15,6 +15,9 @@ class Asset(Place):
         super().__init__(x,y)
         self.threshold = th
 
+    def getThreshold(self):
+        return self.threshold
+
 class ProbabilisticCharacterization:
     def __init__(self, mu, sigma):
         self.mu = mu
