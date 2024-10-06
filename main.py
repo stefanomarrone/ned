@@ -1,66 +1,42 @@
 import sys
-from random import uniform
-from typing import List
-
-import matplotlib.pyplot as plt
-import numpy as np
-from sympy.codegen import aug_assign
-
-from domain.areaofinterest import AreaOfInterest
 from domain.geometry import Geometry
-from domain.process import Process, SpikeProcess
+from domain.results import Results
 from domain.sensors import Sensor
-from domain.utils import ProbabilisticCharacterization, Place, transport_formula, generate_table, Asset
+from domain.utils import transport_formula, generate_table, Asset
 from factory.process import ProcessFactoryRegistry
 from utils.configuration import Configuration
 
-
-def run_simulation(geometry: Geometry, num_steps, vals=None):
+def run_simulation(geometry: Geometry, num_steps):
     process = []
-    sensors = geometry.sensors
+    sensor_names = list(map(lambda s: s.getName(),geometry.sensors))
     aoi_places = geometry.aoi
-
-    measures = {idx: [] for idx in range(len(sensors))}
+    measures = {name: [] for name in sensor_names}
     aois = {idx: [] for idx in range(len(aoi_places))}
-    if vals is not None:
-        num_steps = len(vals)
-
     for i in range(num_steps):
-        if vals is None:
-            v = geometry.process.generate()
-        else:
-            v = vals[i]
+        v = geometry.process.generate()
         process.append(v)
-        for idx, s in enumerate(sensors):
-            measures[idx].append(
-                transport_formula(v, s.probabilistic_characterization, geometry.process.place, s.place))
+        for s in geometry.sensors:
+            name = s.getName()
+            data = transport_formula(v, s.probabilistic_characterization, geometry.process.place, s.place)
+            measures[name].append(data)
         for idx, place in enumerate(aoi_places):
             aois[idx].append(transport_formula(v, None, geometry.process.place, place))
-    return process, measures, aois
+    # Threshold
+    thresholds = dict()
+    for s in geometry.sensors:
+        thresholds[s.getName()] = s.getThreshold()
+    thresholds['asset'] = aoi_places[0].getThreshold()    # todo: extends in case of multiple asset
+    results = Results(process, measures, aois, thresholds)
+    return results
 
-
-def poi_thr(val, d):
-    return val / d
-
-
-def main_run():
-
-    process: Process = SpikeProcess(ProbabilisticCharacterization(0, 0.02), 100, spike_rate=0.07,
-                                    spike_range=np.linspace(0, 70))
-    poi: List[Place] = [Place(5, 0)]  # , Place(-5, 0), Place(0, 5), Place(0, -5)]
-    sensors: List[Sensor] = [Sensor(Place(1, 2), None, psuccess=0.8), Sensor(Place(1, -2), None, psuccess=0.8)]
-
-    geometry = Geometry(process, sensors, AreaOfInterest(places=poi))
-    geometry.draw_geometry()
-    for idx, _ in enumerate(geometry.sensors):
-        geometry.sensors[idx].probabilistic_characterization = ProbabilisticCharacterization(0, uniform(0.05, 1.2))
-    process, measures, aois = run_simulation(geometry=geometry, num_steps=100)
+def draw_plots(results):
+    pass
+'''
     # print results
     plt.figure(figsize=(20, 6))
     plt.plot(process)
     plt.title('process')
     plt.show()
-    num_measures = len(measures)
     fig, axs = plt.subplots(num_measures, 1, figsize=(20, 6))
     thr_measures = []
     thr_y = []
@@ -120,6 +96,8 @@ def main_run():
     plt.show()
     print(generate_table(thr_measures, thr_aois))
 
+'''
+
 def build(configuration):
     # Process setting
     process_info = configuration.get('process')
@@ -137,21 +115,22 @@ def build(configuration):
     geometry = Geometry(process, sensors, [asset])
     return geometry
 
-
-
 def core(configuration_filename, draw_flag):
     config = Configuration(configuration_filename)
     geometry = build(config)
-    if draw_flag:
-        geometry.draw_geometry()
     number_of_steps = config.get('simulation_steps')
-    process, measures, aois = run_simulation(geometry=geometry, num_steps=number_of_steps)
-    pass
+    results = run_simulation(geometry=geometry, num_steps=number_of_steps)
 
+
+    num_measures = len(results)
+    if draw_flag:
+        out_folder = config.get('outfolder')
+        geometry.draw(out_folder)
+        results.draw(out_folder)
+    pass
 
 if __name__ == '__main__':
     if len(sys.argv) >= 2:
         configuration_filename = sys.argv[1]
         drawing_flag = (len(sys.argv) > 2) and (sys.argv.__contains__('--draw'))
         core(configuration_filename, drawing_flag)
-
