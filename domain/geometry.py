@@ -15,7 +15,7 @@ class Geometry:
         self.sensors = sensors
         self.aoi = aoi
 
-    def draw(self):
+    def draw(self, out_folder):
         grid_size = 21  # fixed size for draw simplicity
         half_grid = (grid_size - 1) // 2  # This will help place (0,0) in the center
 
@@ -27,35 +27,28 @@ class Geometry:
 
         # Create a grid and set all to white initially
         grid = np.ones((grid_size, grid_size, 3))  # NxN pixels with RGB channels
-
         # Set Area of Interest to green
         for aoi in self.aoi:
             grid_x_aoi, grid_y_aoi = convert_to_grid_coords(aoi.x, aoi.y)
             grid[grid_size - grid_y_aoi - 1, grid_x_aoi] = [0, 1, 0]  # RGB for green
-
         # Set Process to red
         grid_x_process, grid_y_process = convert_to_grid_coords(self.process.place.x, self.process.place.y)
         grid[grid_size - grid_y_process - 1, grid_x_process] = [1, 0, 0]  # RGB for red
-
         # Set Sensors to grey
         for s in self.sensors:
             grid_x_sensor, grid_y_sensor = convert_to_grid_coords(s.place.x, s.place.y)
             grid[grid_size - grid_y_sensor - 1, grid_x_sensor] = [0, 0, 1]  # RGB for blue
-
         # Plot the grid
         plt.imshow(grid, extent=(-half_grid, half_grid, -half_grid, half_grid))
         plt.grid(True)
-
         # Add x and y axis labels
         plt.xlabel("x")
         plt.ylabel("y")
-
         # Show x and y ticks at regular intervals
         plt.xticks(np.arange(-half_grid, half_grid + 1, 1))
         plt.yticks(np.arange(-half_grid, half_grid + 1, 1))
-
         plt.title('Geometry Map')
-        plt.show()
+        plt.savefig(out_folder + "process.pdf", format="pdf", bbox_inches="tight")
 
     @staticmethod
     def generate_random_geometry(processType: Process, num_sensors, num_poi: Union[int, None] = None,
