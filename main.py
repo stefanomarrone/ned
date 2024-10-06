@@ -120,9 +120,7 @@ def core(configuration_filename, draw_flag):
     geometry = build(config)
     number_of_steps = config.get('simulation_steps')
     results = run_simulation(geometry=geometry, num_steps=number_of_steps)
-
-
-    num_measures = len(results)
+    table = results.get_detection_table()
     if draw_flag:
         out_folder = config.get('outfolder')
         geometry.draw(out_folder)

@@ -1,4 +1,6 @@
 from matplotlib import pyplot as plt
+import pandas as pd
+
 
 class Results:
 
@@ -10,6 +12,15 @@ class Results:
 
     def __len__(self):
         return len(self.sensors.keys())
+
+    def number_of_samples(self):
+        sensor_names = list(self.sensors.keys())
+        key = sensor_names[0]
+        data_sample = self.sensors[key]
+        return len(data_sample)
+
+    def get_sensor_names(self):
+        return self.sensors.keys()
 
     def draw_process(self, output_folder):
         plt.figure(figsize=(20, 6))
@@ -45,3 +56,13 @@ class Results:
         self.draw_process(output_folder)
         self.draw_sensors(output_folder)
         self.draw_asset(output_folder)
+
+    #todo: it works just in case of one asset
+    def get_detection_table(self):
+        detection = dict(self.sensors)
+        detection['asset'] = self.assets[0]
+        for key in detection.keys():
+            threshold = self.thresholds[key]
+            detection[key] = list(map(lambda x: x >= threshold, detection[key]))
+        table = pd.DataFrame(detection)
+        return table
