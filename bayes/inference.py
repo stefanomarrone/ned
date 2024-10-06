@@ -10,25 +10,19 @@ from configparser import ConfigParser
 import sys
 
 class Network:
-    def __init__(self, ssensors, aasset, ddataset):
-        self.asset = aasset
-        self.sensors = ssensors
-        self.dataset = ddataset
+    def __init__(self, sensor_names):
         self.model = None
+        self.sensor_names = sensor_names
 
-    def get_network_structure(self):
-        asset_names = list(self.asset.getName())
-        sensor_names = list(map(lambda s: s.getName(), self.sensors))
-        couples = list(product(sensor_names,asset_names))
-        return couples
-
-    def data_adjusting(self):
-        pass #todo completare la funzione
-
-
-
-
-    def inference(self, data):
+    def build(self, result_table):
         couples = self.get_network_structure()
         self.model = BayesianNetwork(couples)
-        self.model.fit(self.data, estimator=MaximumLikelihoodEstimator)
+        self.model.fit(result_table, estimator=MaximumLikelihoodEstimator)
+        #todo: complete with network a posteriori inference
+        pass
+
+
+    def get_network_structure(self):
+        asset_names = ['asset']
+        couples = list(product(self.sensor_names,asset_names))
+        return couples
