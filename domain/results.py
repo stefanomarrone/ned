@@ -20,7 +20,7 @@ class Results:
         return len(data_sample)
 
     def get_sensor_names(self):
-        return self.sensors.keys()
+        return list(self.sensors.keys())
 
     def draw_process(self, output_folder):
         plt.figure(figsize=(20, 6))
