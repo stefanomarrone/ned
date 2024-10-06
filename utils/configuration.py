@@ -49,7 +49,7 @@ class Configuration(metaclass=Singleton):
         reader.read_file(inifile)
         try:
             # Main configuration
-            temp = int(reader['main']['outfolder'])
+            temp = reader['main']['outfolder']
             self.put('outfolder',temp)
             temp = int(reader['main']['simulation_steps'])
             self.put('simulation_steps',temp)
