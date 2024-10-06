@@ -23,3 +23,6 @@ class Sensor:
 
     def getName(self):
         return self.name
+
+    def getThreshold(self):
+        return self.threshold
