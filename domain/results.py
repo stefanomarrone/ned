@@ -31,12 +31,10 @@ class Results:
     def draw_sensors(self, output_folder):
         num_measures = len(self.sensors.keys())
         fig, axs = plt.subplots(num_measures, 1, figsize=(20, 6))
-        thr_y = []
         i = 0
         for sensor_name in self.sensors.keys():
             sensor = self.sensors[sensor_name]
             thr = self.thresholds[sensor_name]
-            thr_y.append(thr)
             axs[i].plot(sensor)
             axs[i].plot(range(len(sensor)), [thr] * len(sensor))
             axs[i].set_title(sensor_name)
@@ -57,7 +55,7 @@ class Results:
         self.draw_sensors(output_folder)
         self.draw_asset(output_folder)
 
-    #todo: it works just in case of one asset
+    # todo: it works just in case of one asset
     def get_detection_table(self):
         detection = dict(self.sensors)
         detection['asset'] = self.assets[0]
@@ -81,7 +79,7 @@ class Results:
                 intervals.append(counter)
             counter += 1
         if data[0] == from_value:
-            intervals.insert(0,0)
+            intervals.insert(0, 0)
         if len(intervals) % 2 > 0:
             intervals = intervals[:-1]
         counter = 0
@@ -89,15 +87,15 @@ class Results:
         while counter < len(intervals):
             differences.append(intervals[counter + 1] - intervals[counter])
             counter += 2
-        return float(sum(differences))/float(len(differences))
-
+        return float(sum(differences)) / float(len(differences))
 
     def get_process_activation_deactivation_rates(self):
         activations = 0
         deactivations = 0
         try:
-            activations = 1 / self.get_process_rate(False,True)
-            deactivations = 1 / self.get_process_rate(True,False)
+            # TODO: Il secondo parametro non viene utilizzato! fare un check.
+            activations = 1 / self.get_process_rate(False, True)
+            deactivations = 1 / self.get_process_rate(True, False)
         except Exception as s:
             pass
         return activations, deactivations

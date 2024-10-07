@@ -7,9 +7,10 @@ from domain.utils import transport_formula, Asset
 from domain.factory import ProcessFactoryRegistry
 from utils.configuration import Configuration
 
+
 def run_simulation(geometry: Geometry, num_steps):
     process = []
-    sensor_names = list(map(lambda s: s.getName(),geometry.sensors))
+    sensor_names = list(map(lambda s: s.getName(), geometry.sensors))
     aoi_places = geometry.aoi
     measures = {name: [] for name in sensor_names}
     aois = {idx: [] for idx in range(len(aoi_places))}
@@ -26,9 +27,10 @@ def run_simulation(geometry: Geometry, num_steps):
     thresholds = dict()
     for s in geometry.sensors:
         thresholds[s.getName()] = s.getThreshold()
-    thresholds['asset'] = aoi_places[0].getThreshold()    # todo: extends in case of multiple asset
+    thresholds['asset'] = aoi_places[0].getThreshold()  # todo: extends in case of multiple asset
     results = Results(process, measures, aois, thresholds)
     return results
+
 
 def build(configuration):
     # Process setting
@@ -59,6 +61,7 @@ def make_global_parameters(analysis, activation_rate, deactivation_rate, config)
                            'kind': config.get('scheduler')}
     return retval
 
+
 def core(configuration_filename, draw_flag):
     config = Configuration(configuration_filename)
     geometry = build(config)
@@ -79,6 +82,7 @@ def core(configuration_filename, draw_flag):
         out_folder = config.get('outfolder')
         geometry.draw(out_folder)
         results.draw(out_folder)
+
 
 if __name__ == '__main__':
     if len(sys.argv) >= 2:
