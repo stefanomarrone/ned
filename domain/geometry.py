@@ -1,5 +1,6 @@
+import os
 import random
-from typing import List, Union
+from typing import List, Union, Optional
 
 from domain.areaofinterest import AreaOfInterest
 from domain.process import Process
@@ -15,7 +16,7 @@ class Geometry:
         self.sensors = sensors
         self.aoi = aoi
 
-    def draw(self, out_folder):
+    def draw(self, out_folder: Optional = None):
         grid_size = 21  # fixed size for draw simplicity
         half_grid = (grid_size - 1) // 2  # This will help place (0,0) in the center
 
@@ -48,7 +49,13 @@ class Geometry:
         plt.xticks(np.arange(-half_grid, half_grid + 1, 1))
         plt.yticks(np.arange(-half_grid, half_grid + 1, 1))
         plt.title('Geometry Map')
-        plt.savefig(out_folder + "process.pdf", format="pdf", bbox_inches="tight")
+        if out_folder is not None:
+            path = f'{os.getcwd()}/{out_folder}'
+            if os.path.exists(path) is not True:
+                os.mkdir(path)
+            plt.savefig(out_folder + "geometry.pdf", format="pdf", bbox_inches="tight")
+        else:
+            plt.show()
 
     @staticmethod
     def generate_random_geometry(processType: Process, num_sensors, num_poi: Union[int, None] = None,

@@ -1,7 +1,6 @@
 from typing import Union
 
 import numpy as np
-import pandas as pd
 
 
 class Place:
@@ -10,11 +9,14 @@ class Place:
         self.x = x
         self.y = y
 
+class SafetyMethod:
+    pass
+
 class Asset(Place):
-    def __init__(self, x, y, th):
+    def __init__(self, x, y, th, sm: Union[SafetyMethod, None] = None):
         super().__init__(x,y)
         self.threshold = th
-
+        self.safety_method = sm
     def getThreshold(self):
         return self.threshold
 
@@ -24,8 +26,7 @@ class ProbabilisticCharacterization:
         self.sigma = sigma
 
 
-class SafetyMethod:
-    pass
+
 
 
 def transport_formula(p_val, probabilistic_characterization: Union[ProbabilisticCharacterization, None], p_place: Place,

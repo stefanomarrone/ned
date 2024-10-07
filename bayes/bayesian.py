@@ -1,8 +1,8 @@
 from itertools import product
-from pgmpy.models import BayesianNetwork
+
 from pgmpy.estimators import MaximumLikelihoodEstimator
 from pgmpy.inference import VariableElimination
-from yt_dlp.utils import determine_ext
+from pgmpy.models import BayesianNetwork
 
 
 class Network:
