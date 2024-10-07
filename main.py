@@ -48,19 +48,37 @@ def build(configuration):
     geometry = Geometry(process, sensors, [asset])
     return geometry
 
+
+def make_global_parameters(analysis, activation_rate, deactivation_rate, config):
+    retval = {'process':
+                  {'activation_rate': activation_rate,
+                   'deactivation_rate': deactivation_rate}}
+    for sensor_name in analysis:
+        retval[sensor_name] = {'detection_probability': analysis[sensor_name]}
+    retval['scheduler'] = {'on_rate': config.get('on_rate'),
+                           'off_rate': config.get('off_rate'),
+                           'kind': config.get('scheduler')}
+    return retval
+
+
+
+
 def core(configuration_filename, draw_flag):
     config = Configuration(configuration_filename)
     geometry = build(config)
     number_of_steps = config.get('simulation_steps')
-    stop = False
-    while not stop:
+    error = True
+    while error:
         results = run_simulation(geometry=geometry, num_steps=number_of_steps)
         table = results.get_detection_table()
         network = Network(results.get_sensor_names())
         network.build(table)
         analysis = network.analysis()
-        stop = bool(analysis)
-
+        error = not bool(analysis)
+        if not error:
+            activation_rate, deactivation_rate = results.get_process_activation_deactivation_rates()
+            error = activation_rate == 0 or deactivation_rate == 0
+            global_parameters = make_global_parameters(analysis, activation_rate, deactivation_rate, config)
     if draw_flag:
         out_folder = config.get('outfolder')
         geometry.draw(out_folder)

@@ -87,6 +87,13 @@ class Configuration(metaclass=Singleton):
                 value = reader[process][process_key]
                 dictionary[process_key] = process_function(value)
             self.put('process',dictionary)
+            # Scheduler configuration
+            temp = reader['main']['scheduling']
+            self.put('scheduler',temp)
+            temp = float(reader['scheduler']['on_rate'])
+            self.put('on_rate',temp)
+            temp = float(reader['scheduler']['off_rate'])
+            self.put('off_rate',temp)
         except Exception as s:
             print(s)
 
