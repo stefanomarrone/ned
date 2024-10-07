@@ -1,5 +1,4 @@
 import sys
-
 from bayes.bayesian import Network
 from domain.geometry import Geometry
 from domain.results import Results
@@ -59,9 +58,6 @@ def make_global_parameters(analysis, activation_rate, deactivation_rate, config)
                            'off_rate': config.get('off_rate'),
                            'kind': config.get('scheduler')}
     return retval
-
-
-
 
 def core(configuration_filename, draw_flag):
     config = Configuration(configuration_filename)
