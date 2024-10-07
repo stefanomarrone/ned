@@ -66,3 +66,38 @@ class Results:
             detection[key] = list(map(lambda x: x >= threshold, detection[key]))
         table = pd.DataFrame(detection)
         return table
+
+    def get_process_rate(self, from_value, to_value):
+        table = dict(self.get_detection_table())
+        data = list(table['asset'])
+        indices = range(len(data))
+        merged_list = tuple(zip(indices, data))
+        intervals = []
+        counter = 1
+        while counter < len(data):
+            old = merged_list[counter - 1]
+            new = merged_list[counter]
+            if new[1] != old[1]:
+                intervals.append(counter)
+            counter += 1
+        if data[0] == from_value:
+            intervals.insert(0,0)
+        if len(intervals) % 2 > 0:
+            intervals = intervals[:-1]
+        counter = 0
+        differences = []
+        while counter < len(intervals):
+            differences.append(intervals[counter + 1] - intervals[counter])
+            counter += 2
+        return float(sum(differences))/float(len(differences))
+
+
+    def get_process_activation_deactivation_rates(self):
+        activations = 0
+        deactivations = 0
+        try:
+            activations = 1 / self.get_process_rate(False,True)
+            deactivations = 1 / self.get_process_rate(True,False)
+        except Exception as s:
+            pass
+        return activations, deactivations
