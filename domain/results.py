@@ -93,7 +93,6 @@ class Results:
         activations = 0
         deactivations = 0
         try:
-            # TODO: Il secondo parametro non viene utilizzato! fare un check.
             activations = 1 / self.get_process_rate(False)
             deactivations = 1 / self.get_process_rate(True)
         except Exception as s:
