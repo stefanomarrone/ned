@@ -65,7 +65,7 @@ class Results:
         table = pd.DataFrame(detection)
         return table
 
-    def get_process_rate(self, from_value, to_value):
+    def get_process_rate(self, from_value):
         table = dict(self.get_detection_table())
         data = list(table['asset'])
         indices = range(len(data))
@@ -94,8 +94,8 @@ class Results:
         deactivations = 0
         try:
             # TODO: Il secondo parametro non viene utilizzato! fare un check.
-            activations = 1 / self.get_process_rate(False, True)
-            deactivations = 1 / self.get_process_rate(True, False)
+            activations = 1 / self.get_process_rate(False)
+            deactivations = 1 / self.get_process_rate(True)
         except Exception as s:
             pass
         return activations, deactivations
