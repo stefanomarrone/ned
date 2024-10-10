@@ -46,6 +46,7 @@ def build(configuration):
     sensors = configuration.get('sensors')
     sensors = list(map(lambda x: Sensor(x, configuration.get(x)), sensors))
     # geometry
+    # @TODO: refactor Geometry's last parameter in AssetsOfInterest
     geometry = Geometry(process, sensors, [asset])
     return geometry
 
