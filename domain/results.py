@@ -35,9 +35,14 @@ class Results:
         for sensor_name in self.sensors.keys():
             sensor = self.sensors[sensor_name]
             thr = self.thresholds[sensor_name]
-            axs[i].plot(sensor)
-            axs[i].plot(range(len(sensor)), [thr] * len(sensor))
-            axs[i].set_title(sensor_name)
+            try:
+                axs[i].plot(sensor)
+                axs[i].plot(range(len(sensor)), [thr] * len(sensor))
+                axs[i].set_title(sensor_name)
+            except Exception as e:
+                axs.plot(sensor)
+                axs.plot(range(len(sensor)), [thr] * len(sensor))
+                axs.set_title(sensor_name)
             i += 1
         plt.savefig(output_folder + "sensor.pdf", format="pdf", bbox_inches="tight")
 

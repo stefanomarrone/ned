@@ -79,6 +79,7 @@ def core(configuration_filename, draw_flag):
             activation_rate, deactivation_rate = results.get_process_activation_deactivation_rates()
             error = activation_rate == 0 or deactivation_rate == 0
             global_parameters = make_global_parameters(analysis, activation_rate, deactivation_rate, config)
+            # gspn_naive_handle.one_sensor_analysis()
     if draw_flag:
         out_folder = config.get('outfolder')
         geometry.draw(out_folder)
