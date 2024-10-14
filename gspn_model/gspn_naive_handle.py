@@ -101,7 +101,7 @@ def one_sensor_analysis(detection_prob, event_end_rate, event_start_rate, on_rat
                               parameters=['-rpar', 'DetectionProb', str(detection_prob), '-rpar', 'EventEndRate',
                                           str(event_end_rate), '-rpar', 'EventStartRate',
                                           str(event_start_rate), '-rpar', 'InRate', str(on_rate), '-rpar', 'OffRate',
-                                          str(off_rate), ])
+                                          str(off_rate)])
 
 
 if __name__ == '__main__':
