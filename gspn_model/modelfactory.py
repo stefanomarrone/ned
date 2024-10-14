@@ -1,5 +1,7 @@
 from gspn_model.engine import Engine
 
+#todo: move from static  method to instance methods
+
 
 class ModelAbstractFactory:
     @staticmethod
