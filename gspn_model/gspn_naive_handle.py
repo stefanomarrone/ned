@@ -1,6 +1,6 @@
 import subprocess
 from enum import Enum
-from typing import List
+import copy
 
 import numpy as np
 
@@ -62,7 +62,7 @@ class Operation:
 
 
 def run_steady_state_analysis(model_name, parameters):
-    extended_pars = parameters
+    extended_pars = copy.deepcopy(parameters)
     extended_pars.extend([
         '-m',
         '-gui-stat', '-dot-F',
