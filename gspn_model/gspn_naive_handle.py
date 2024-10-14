@@ -61,28 +61,16 @@ class Operation:
         self.parameters = parameters
 
 
-def run_steady_state_analysis(model_name, ops: List[Operation]):
-    for op in ops:
-        if op.type == OpType.gspn:
-            run_greatspn(model_name, op.name,
-                         op.parameters)
-        else:
-            subprocess.run(op.name)
-
-
-# @TODO: find a way to use the gspn_modelfactory
-def one_sensor_analysis(detection_prob, event_end_rate, event_start_rate, on_rate, off_rate):
-    model_name = 'models/one_sensor'
+def run_steady_state_analysis(model_name, parameters):
+    extended_pars = parameters
+    extended_pars.extend([
+        '-m',
+        '-gui-stat', '-dot-F',
+        f"{model_name}-RG-0", '-max-dot-markings', '80'])
     operations = [
         # Call WNRG procedure with custom parameters
-
         Operation(op_type=OpType.gspn, name='WNRG',
-                  parameters=['-rpar', 'DetectionProb', str(detection_prob), '-rpar', 'EventEndRate',
-                              str(event_end_rate), '-rpar', 'EventStartRate',
-                              str(event_start_rate), '-rpar', 'InRate', str(on_rate), '-rpar', 'OffRate', str(off_rate),
-                              '-m',
-                              '-gui-stat', '-dot-F',
-                              f"{model_name}-RG-0", '-max-dot-markings', '80']),
+                  parameters=extended_pars),
         # Clear .gst file
         Operation(op_type=OpType.cmd, name=["cp", "/dev/null", f"{model_name}.gst"]),
         # Call swn_stndrd
@@ -93,14 +81,27 @@ def one_sensor_analysis(detection_prob, event_end_rate, event_start_rate, on_rat
         Operation(op_type=OpType.cmd, name=["cp", f"{model_name}.epd", f"{model_name}.mpd"]),
         # Call swn_gst_prep with different parameters
         Operation(op_type=OpType.gspn, name='swn_gst_prep',
-                  parameters=['-rpar', 'DetectionProb', str(detection_prob), '-rpar', 'EventEndRate',
-                              str(event_end_rate), '-rpar', 'EventStartRate',
-                              str(event_start_rate), '-rpar', 'InRate', str(on_rate), '-rpar', 'OffRate',
-                              str(off_rate)]),
+                  parameters=parameters),
         # Call swn_gst_stndrd
         Operation(op_type=OpType.gspn, name='swn_gst_stndrd', parameters=['-append', f"{model_name}.sta"])
     ]
-    run_steady_state_analysis(model_name=model_name, ops=operations)
+    for op in operations:
+        if op.type == OpType.gspn:
+            run_greatspn(model_name, op.name,
+                         op.parameters)
+        else:
+            subprocess.run(op.name)
+
+
+# @TODO: find a way to use the gspn_modelfactory
+def one_sensor_analysis(detection_prob, event_end_rate, event_start_rate, on_rate, off_rate):
+    model_name = 'models/one_sensor'
+
+    run_steady_state_analysis(model_name=model_name,
+                              parameters=['-rpar', 'DetectionProb', str(detection_prob), '-rpar', 'EventEndRate',
+                                          str(event_end_rate), '-rpar', 'EventStartRate',
+                                          str(event_start_rate), '-rpar', 'InRate', str(on_rate), '-rpar', 'OffRate',
+                                          str(off_rate), ])
 
 
 if __name__ == '__main__':
