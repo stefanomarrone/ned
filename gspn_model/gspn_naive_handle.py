@@ -117,6 +117,22 @@ def one_sensor_analysis(detection_prob, event_end_rate, event_start_rate, on_rat
                                           str(off_rate)])
 
 
+def generic_analysis(model_name, parameter_list):
+    model_name = 'one_sensor'
+    try:
+        # making the directory
+        path = f'{os.getcwd()}/{model_name}_analysis'
+        os.makedirs(path, exist_ok=True)
+        # moving all the file here
+        shutil.copy(f'{model_name}.def', path)
+        shutil.copy(f'{model_name}.net', path)
+        model_name = f'{path}/{model_name}'
+    except Exception as e:
+        print(e)
+        raise
+    run_steady_state_analysis(model_name=model_name,parameters=parameter_list)
+
+
 if __name__ == '__main__':
     one_sensor_analysis(detection_prob=np.float64(0.59),
                         event_end_rate=0.97,
