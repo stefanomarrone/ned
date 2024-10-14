@@ -64,7 +64,7 @@ class Operation:
 def run_steady_state_analysis(model_name, ops: List[Operation]):
     for op in ops:
         if op.type == OpType.gspn:
-            run_greatspn(model_name, op,
+            run_greatspn(model_name, op.name,
                          op.parameters)
         else:
             subprocess.run(op.name)
