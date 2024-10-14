@@ -5,6 +5,7 @@ from domain.results import Results
 from domain.sensors import Sensor
 from domain.utils import transport_formula, Asset
 from domain.factory import ProcessFactoryRegistry
+from gspn_model.modelfactory import PlainModelFactory
 from utils.configuration import Configuration
 
 
@@ -55,8 +56,9 @@ def make_global_parameters(analysis, activation_rate, deactivation_rate, config)
     retval = {'process':
                   {'activation_rate': activation_rate,
                    'deactivation_rate': deactivation_rate}}
+    retval['sensors'] = dict()
     for sensor_name in analysis:
-        retval[sensor_name] = {'detection_probability': analysis[sensor_name]}
+        retval['sensors'][sensor_name] = {'detection_probability': analysis[sensor_name]}
     retval['scheduler'] = {'on_rate': config.get('on_rate'),
                            'off_rate': config.get('off_rate'),
                            'kind': config.get('scheduler')}
@@ -64,6 +66,8 @@ def make_global_parameters(analysis, activation_rate, deactivation_rate, config)
 
 
 def core(configuration_filename, draw_flag):
+    safety_measure = 0
+    sustainability_measure = 0
     config = Configuration(configuration_filename)
     geometry = build(config)
     number_of_steps = config.get('simulation_steps')
@@ -79,12 +83,17 @@ def core(configuration_filename, draw_flag):
             activation_rate, deactivation_rate = results.get_process_activation_deactivation_rates()
             error = activation_rate == 0 or deactivation_rate == 0
             global_parameters = make_global_parameters(analysis, activation_rate, deactivation_rate, config)
+            gspn_repo = config.get('greatspn_repos')
+            engine = PlainModelFactory.generate(global_parameters, gspn_repo)
+            engine.execute()
+            safety_measure = engine.safety()
+            sustainability_measure = engine.sustainability()
             # gspn_naive_handle.one_sensor_analysis()
     if draw_flag:
         out_folder = config.get('outfolder')
         geometry.draw(out_folder)
         results.draw(out_folder)
-
+    return safety_measure, sustainability_measure
 
 if __name__ == '__main__':
     if len(sys.argv) >= 2:
