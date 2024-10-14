@@ -49,6 +49,10 @@ class Configuration(metaclass=Singleton):
         reader.read_file(inifile)
         try:
             # Main configuration
+            temp = reader['main']['greatspn_bin']
+            self.put('greatspn',temp)
+            temp = reader['main']['greatspn_project']
+            self.put('greatspn_repos',temp)
             temp = reader['main']['outfolder']
             self.put('outfolder',temp)
             temp = int(reader['main']['simulation_steps'])
