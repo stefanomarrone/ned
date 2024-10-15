@@ -6,6 +6,7 @@ class Engine:
     def __init__(self, model, configuration):
         self.model = model
         self.model_configuration = configuration
+        self.model_repo = configuration['repo']
         config = Configuration()
         self.gspn_bin_path = config.get('greatspn') #todo: use the parameter and make run general
 
@@ -16,6 +17,6 @@ class Engine:
         return retval
 
     def execute(self):
-        generic_analysis(self.model, self.getParamList())
+        generic_analysis(self.model, self.model_repo, self.getParamList())
 
 

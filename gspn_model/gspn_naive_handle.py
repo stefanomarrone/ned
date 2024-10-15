@@ -21,6 +21,7 @@ def run_greatspn(model_name, procedure, params, greatspn_scripts="/opt/greatspn/
     # Run the command
     subprocess.run(command)
 
+
 class OpType(Enum):
     gspn = 'GSPN'
     cmd = 'CMD'
@@ -87,14 +88,14 @@ def one_sensor_analysis(detection_prob, event_end_rate, event_start_rate, on_rat
                                           str(off_rate)])
 
 
-def generic_analysis(model_name, parameter_list):
+def generic_analysis(model_name, model_repo, parameter_list):
     try:
         # making the directory
-        path = f'{os.getcwd()}/{model_name}_analysis'
+        path = f'{os.getcwd()}/{model_repo}/{model_name}_analysis'
         os.makedirs(path, exist_ok=True)
         # moving all the file here
-        shutil.copy(f'{model_name}.def', path)
-        shutil.copy(f'{model_name}.net', path)
+        shutil.copy(f'{os.getcwd()}/{model_repo}/{model_name}.def', path)
+        shutil.copy(f'{os.getcwd()}/{model_repo}/{model_name}.net', path)
         model_name = f'{path}/{model_name}'
     except Exception as e:
         print(e)

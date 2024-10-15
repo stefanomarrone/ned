@@ -94,11 +94,11 @@ class PlainModelFactory:
         default = PlainModelFactory.model_kb[numbers].get('default')
         scheduling_policy = gspn_parameters['scheduler']['kind']
         model_name, configuration_label = PlainModelFactory.model_kb[numbers].get(scheduling_policy, default)
-        model_full_name = repository_folder + model_name
         configuration = PlainModelFactory.configurations[configuration_label]
         for key in configuration.keys():
             func = configuration[key]
             value = func(gspn_parameters)
             configuration[key] = value
-        engine = Engine(model_full_name, configuration)
+        configuration['repo'] = repository_folder
+        engine = Engine(model_name, configuration)
         return engine
