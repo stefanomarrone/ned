@@ -3,12 +3,12 @@ from utils.configuration import Configuration
 
 
 class Engine:
-    def __init__(self, model, configuration):
+    def __init__(self, model, model_repo, configuration):
         self.model = model
         self.model_configuration = configuration
-        self.model_repo = configuration['repo']
+        self.model_repo = model_repo
         config = Configuration()
-        self.gspn_bin_path = config.get('greatspn') #todo: use the parameter and make run general
+        self.gspn_bin_path = config.get('greatspn')  # todo: use the parameter and make run general
 
     def getParamList(self):
         retval = list()
@@ -18,5 +18,3 @@ class Engine:
 
     def execute(self):
         generic_analysis(self.model, self.model_repo, self.getParamList())
-
-
