@@ -5,6 +5,7 @@ from domain.results import Results
 from domain.sensors import Sensor
 from domain.utils import transport_formula, Asset
 from domain.factory import ProcessFactoryRegistry
+from gspn_model.engine import Engine
 from gspn_model.modelfactory import PlainModelFactory
 from utils.configuration import Configuration
 
@@ -94,6 +95,7 @@ def core(configuration_filename, draw_flag):
         geometry.draw(out_folder)
         results.draw(out_folder)
     return safety_measure, sustainability_measure
+
 
 if __name__ == '__main__':
     if len(sys.argv) >= 2:

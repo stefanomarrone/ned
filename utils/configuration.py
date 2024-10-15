@@ -7,10 +7,7 @@ import io
 from utils.utils import tostring
 
 
-
-
 class Configuration(metaclass=Singleton):
-
     process_registry = {
         'spike': [('range', float), ('rate', float), ('mu', float), ('sigma', float), ('level', float)],
         'walk': [('drift', float), ('mu', float), ('sigma', float), ('level', float)]
@@ -27,7 +24,7 @@ class Configuration(metaclass=Singleton):
     def put(self, key, value):
         self.board[key] = value
 
-    def loadSection(self,reader,s):
+    def loadSection(self, reader, s):
         temp = dict()
         options = []
         try:
@@ -50,24 +47,24 @@ class Configuration(metaclass=Singleton):
         try:
             # Main configuration
             temp = reader['main']['greatspn_bin']
-            self.put('greatspn',temp)
+            self.put('greatspn', temp)
             temp = reader['main']['greatspn_project']
-            self.put('greatspn_repos',temp)
+            self.put('greatspn_repos', temp)
             temp = reader['main']['outfolder']
-            self.put('outfolder',temp)
+            self.put('outfolder', temp)
             temp = int(reader['main']['simulation_steps'])
-            self.put('simulation_steps',temp)
+            self.put('simulation_steps', temp)
             temp = float(reader['main']['hazardlevel'])
-            self.put('hazardlevel',temp)
+            self.put('hazardlevel', temp)
             temp = reader['main']['asset']
             temp = temp.split(',')
             temp = tuple([float(i) for i in temp])
-            self.put('asset',temp)
+            self.put('asset', temp)
             temp = reader['main']['sensors']
             sensors = list(temp.split(','))
-            self.put('sensors',temp.split(','))
+            self.put('sensors', temp.split(','))
             temp = reader['main']['process']
-            self.put('process',temp)
+            self.put('process', temp)
             # Sensors configuration
             for sensor in sensors:
                 sensor_parameters = dict()
@@ -81,7 +78,7 @@ class Configuration(metaclass=Singleton):
                 sensor_parameters['mu'] = temp
                 temp = float(reader[sensor]['sigma'])
                 sensor_parameters['sigma'] = temp
-                self.put(sensor,sensor_parameters)
+                self.put(sensor, sensor_parameters)
             # Process configuration
             process = reader['main']['process']
             process_elements = Configuration.process_registry[process]
@@ -90,14 +87,14 @@ class Configuration(metaclass=Singleton):
                 process_key, process_function = element
                 value = reader[process][process_key]
                 dictionary[process_key] = process_function(value)
-            self.put('process',dictionary)
+            self.put('process', dictionary)
             # Scheduler configuration
             temp = reader['main']['scheduling']
-            self.put('scheduler',temp)
+            self.put('scheduler', temp)
             temp = float(reader['scheduler']['on_rate'])
-            self.put('on_rate',temp)
+            self.put('on_rate', temp)
             temp = float(reader['scheduler']['off_rate'])
-            self.put('off_rate',temp)
+            self.put('off_rate', temp)
         except Exception as s:
             print(s)
 
@@ -112,5 +109,3 @@ class Configuration(metaclass=Singleton):
         except Exception as s:
             print(s)
         return content
-
-

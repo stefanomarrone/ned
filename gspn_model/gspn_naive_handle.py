@@ -21,35 +21,6 @@ def run_greatspn(model_name, procedure, params, greatspn_scripts="/opt/greatspn/
     # Run the command
     subprocess.run(command)
 
-
-"""
-OLD EXAMPLE 
-
-# Call WNRG procedure with custom parameters
-run_greatspn(model_name, 'WNRG',
-             ['-mpar', 'CHload', '2', '-mpar', 'CHparallel', '4', '-rpar', 'Pfraud', '8.5', '-m', '-gui-stat', '-dot-F',
-              f"{model_name}-RG-0", '-max-dot-markings', '80'])
-
-# Clear .gst file
-subprocess.run(["cp", "/dev/null", f"{model_name}.gst"])
-
-# Call swn_stndrd
-run_greatspn(model_name, 'swn_stndrd', [])
-
-# Call swn_ggsc with its parameters
-run_greatspn(model_name, 'swn_ggsc', ['-e1.0E-7', '-i10000'])
-
-# Copy .epd to .mpd
-subprocess.run(["cp", f"{model_name}.epd", f"{model_name}.mpd"])
-
-# Call swn_gst_prep with different parameters
-run_greatspn(model_name, 'swn_gst_prep', ['-mpar', 'CHload', '2', '-mpar', 'CHparallel', '4', '-rpar', 'Pfraud', '8.5'])
-
-# Call swn_gst_stndrd
-run_greatspn(model_name, 'swn_gst_stndrd', ['-append', f"{model_name}.sta"])
-"""
-
-
 class OpType(Enum):
     gspn = 'GSPN'
     cmd = 'CMD'
@@ -99,7 +70,6 @@ def one_sensor_analysis(detection_prob, event_end_rate, event_start_rate, on_rat
     model_name = 'one_sensor'
     try:
         # making the directory
-
         path = f'{os.getcwd()}/models/{model_name}_analysis'
         os.makedirs(path, exist_ok=True)
         # moving all the file here
@@ -118,7 +88,6 @@ def one_sensor_analysis(detection_prob, event_end_rate, event_start_rate, on_rat
 
 
 def generic_analysis(model_name, parameter_list):
-    model_name = 'one_sensor'
     try:
         # making the directory
         path = f'{os.getcwd()}/{model_name}_analysis'
@@ -130,7 +99,7 @@ def generic_analysis(model_name, parameter_list):
     except Exception as e:
         print(e)
         raise
-    run_steady_state_analysis(model_name=model_name,parameters=parameter_list)
+    run_steady_state_analysis(model_name=model_name, parameters=parameter_list)
 
 
 if __name__ == '__main__':

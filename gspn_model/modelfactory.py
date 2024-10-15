@@ -1,6 +1,7 @@
 from gspn_model.engine import Engine
 
-#todo: move from static  method to instance methods
+
+# todo: move from static  method to instance methods
 
 
 class ModelAbstractFactory:
@@ -21,44 +22,45 @@ class PlainModelFactory:
         label = labels[index]
         return db[group][label][feature]
 
-
-
     configurations = {
         'one': {
-            'EventEndRate': lambda conf: PlainModelFactory.simple(conf, 'process', 'activation_rate'),
-            'EventStartRate': lambda conf: PlainModelFactory.simple(conf, 'process', 'deactivation_rate'),
-            'InRate':  lambda conf: PlainModelFactory.simple(conf, 'scheduler', 'on_rate'),
-            'OffRate':  lambda conf: PlainModelFactory.simple(conf, 'scheduler', 'off_rate'),
+            'EventStartRate': lambda conf: PlainModelFactory.simple(conf, 'process', 'activation_rate'),
+            'EventEndRate': lambda conf: PlainModelFactory.simple(conf, 'process', 'deactivation_rate'),
+            'InRate': lambda conf: PlainModelFactory.simple(conf, 'scheduler', 'on_rate'),
+            'OffRate': lambda conf: PlainModelFactory.simple(conf, 'scheduler', 'off_rate'),
             'DetectionProb': lambda conf: PlainModelFactory.indexed(conf, 'sensors', 0, 'detection_probability'),
             'UnDetectionProb': lambda conf: 1 - PlainModelFactory.indexed(conf, 'sensors', 0, 'detection_probability')
         },
         'two': {
-            'EventEndRate': lambda conf: PlainModelFactory.simple(conf, 'process', 'activation_rate'),
-            'EventStartRate': lambda conf: PlainModelFactory.simple(conf, 'process', 'deactivation_rate'),
-            'InRate_1':  lambda conf: PlainModelFactory.simple(conf, 'scheduler', 'on_rate'),
-            'OffRate_1':  lambda conf: PlainModelFactory.simple(conf, 'scheduler', 'off_rate'),
-            'InRate_2':  lambda conf: PlainModelFactory.simple(conf, 'scheduler', 'on_rate'),
-            'OffRate_2':  lambda conf: PlainModelFactory.simple(conf, 'scheduler', 'off_rate'),
+            'EventStartRate': lambda conf: PlainModelFactory.simple(conf, 'process', 'activation_rate'),
+            'EventEndRate': lambda conf: PlainModelFactory.simple(conf, 'process', 'deactivation_rate'),
+            'InRate_1': lambda conf: PlainModelFactory.simple(conf, 'scheduler', 'on_rate'),
+            'OffRate_1': lambda conf: PlainModelFactory.simple(conf, 'scheduler', 'off_rate'),
+            'InRate_2': lambda conf: PlainModelFactory.simple(conf, 'scheduler', 'on_rate'),
+            'OffRate_2': lambda conf: PlainModelFactory.simple(conf, 'scheduler', 'off_rate'),
             'DetectionProb_1': lambda conf: PlainModelFactory.indexed(conf, 'sensors', 0, 'detection_probability'),
-            'UnDetectionProb_1': lambda conf: 1 - PlainModelFactory.indexed(conf, 'sensors', 0,'detection_probability'),
-            'DetectionProb_2': lambda conf: PlainModelFactory.indexed(conf, 'sensors', 1,'detection_probability'),
-            'UnDetectionProb_2': lambda conf: 1 - PlainModelFactory.indexed(conf, 'sensors', 1,'detection_probability')
+            'UnDetectionProb_1': lambda conf: 1 - PlainModelFactory.indexed(conf, 'sensors', 0,
+                                                                            'detection_probability'),
+            'DetectionProb_2': lambda conf: PlainModelFactory.indexed(conf, 'sensors', 1, 'detection_probability'),
+            'UnDetectionProb_2': lambda conf: 1 - PlainModelFactory.indexed(conf, 'sensors', 1, 'detection_probability')
         },
         'three': {
-            'EventEndRate': lambda conf: PlainModelFactory.simple(conf, 'process', 'activation_rate'),
-            'EventStartRate': lambda conf: PlainModelFactory.simple(conf, 'process', 'deactivation_rate'),
-            'InRate_1':  lambda conf: PlainModelFactory.simple(conf, 'scheduler', 'on_rate'),
-            'OffRate_1':  lambda conf: PlainModelFactory.simple(conf, 'scheduler', 'off_rate'),
-            'InRate_2':  lambda conf: PlainModelFactory.simple(conf, 'scheduler', 'on_rate'),
-            'OffRate_2':  lambda conf: PlainModelFactory.simple(conf, 'scheduler', 'off_rate'),
-            'InRate_3':  lambda conf: PlainModelFactory.simple(conf, 'scheduler', 'on_rate'),
-            'OffRate_3':  lambda conf: PlainModelFactory.simple(conf, 'scheduler', 'off_rate'),
+            'EvenStartRate': lambda conf: PlainModelFactory.simple(conf, 'process', 'activation_rate'),
+            'EventEndRate': lambda conf: PlainModelFactory.simple(conf, 'process', 'deactivation_rate'),
+            'InRate_1': lambda conf: PlainModelFactory.simple(conf, 'scheduler', 'on_rate'),
+            'OffRate_1': lambda conf: PlainModelFactory.simple(conf, 'scheduler', 'off_rate'),
+            'InRate_2': lambda conf: PlainModelFactory.simple(conf, 'scheduler', 'on_rate'),
+            'OffRate_2': lambda conf: PlainModelFactory.simple(conf, 'scheduler', 'off_rate'),
+            'InRate_3': lambda conf: PlainModelFactory.simple(conf, 'scheduler', 'on_rate'),
+            'OffRate_3': lambda conf: PlainModelFactory.simple(conf, 'scheduler', 'off_rate'),
             'DetectionProb_1': lambda conf: PlainModelFactory.indexed(conf, 'sensors', 0, 'detection_probability'),
-            'UnDetectionProb_1': lambda conf: 1 - PlainModelFactory.indexed(conf, 'sensors', 0,'detection_probability'),
-            'DetectionProb_2': lambda conf: PlainModelFactory.indexed(conf, 'sensors', 1,'detection_probability'),
-            'UnDetectionProb_2': lambda conf: 1 - PlainModelFactory.indexed(conf, 'sensors', 1,'detection_probability'),
+            'UnDetectionProb_1': lambda conf: 1 - PlainModelFactory.indexed(conf, 'sensors', 0,
+                                                                            'detection_probability'),
+            'DetectionProb_2': lambda conf: PlainModelFactory.indexed(conf, 'sensors', 1, 'detection_probability'),
+            'UnDetectionProb_2': lambda conf: 1 - PlainModelFactory.indexed(conf, 'sensors', 1,
+                                                                            'detection_probability'),
             'DetectionProb_3': lambda conf: PlainModelFactory.indexed(conf, 'sensors', 2, 'detection_probability'),
-            'UnDetectionProb_3': lambda conf: 1 - PlainModelFactory.indexed(conf, 'sensors', 2,'detection_probability')
+            'UnDetectionProb_3': lambda conf: 1 - PlainModelFactory.indexed(conf, 'sensors', 2, 'detection_probability')
         }
     }
 
