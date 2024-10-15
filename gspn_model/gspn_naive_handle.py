@@ -118,7 +118,6 @@ def one_sensor_analysis(detection_prob, event_end_rate, event_start_rate, on_rat
 
 
 def generic_analysis(model_name, parameter_list):
-    model_name = 'one_sensor'
     try:
         # making the directory
         path = f'{os.getcwd()}/{model_name}_analysis'
