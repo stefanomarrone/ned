@@ -93,9 +93,8 @@ def core(configuration_filename, draw_flag):
                     print(e)
                 else:
                     raise
-            safety_measure = engine.safety(node_name='Active')  # mean* global_parameters['numero'];
+            safety_measure = engine.safety()  # mean* global_parameters['numero'];
             sustainability_measure = engine.sustainability()
-            # gspn_naive_handle.one_sensor_analysis()
     if draw_flag:
         out_folder = config.get('outfolder')
         geometry.draw(out_folder)
@@ -107,4 +106,7 @@ if __name__ == '__main__':
     if len(sys.argv) >= 2:
         configuration_filename = sys.argv[1]
         drawing_flag = (len(sys.argv) > 2) and (sys.argv.__contains__('--draw'))
-        core(configuration_filename, drawing_flag)
+        mtot, isl = core(configuration_filename, drawing_flag)
+        print(f'MToT = {mtot}')
+        print(f'ISL = {isl}')
+

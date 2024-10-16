@@ -64,16 +64,31 @@ class PlainModelFactory:
         }
     }
 
+    measures = {
+        'uno': {
+            'safety': ['deactivation', 'able'],
+            'sustainability': ['sensing']
+        },
+        'dos': {
+            'safety': ['deactivation', 'able_1', 'able_2'],
+            'sustainability': ['sensing_1', 'sensing_2']
+        },
+        'tres': {
+            'safety': ['deactivation', 'able_1', 'able_2', 'able_3'],
+            'sustainability': ['sensing_1', 'sensing_2', 'sensing_3']
+        }
+    }
+
     model_kb = {
         1: {
-            'default': ('one_sensor', 'one')
+            'default': ('one_sensor', 'one', 'uno')
         },
         2: {
-            'interleaved': ('two_interleaved', 'two'),
-            'most_effective': ('most_effective', 'two'),
-            'default': ('two_sensor', 'two')
+            'interleaved': ('two_interleaved', 'two', 'dos'),
+            'most_effective': ('most_effective', 'two', 'dos'),
+            'default': ('two_sensor', 'two', 'dos')
         },
-        3: {'default': ('three_sensors', 'three')}
+        3: {'default': ('three_sensors', 'three', 'tres')}
     }
 
     @staticmethod
@@ -90,14 +105,15 @@ class PlainModelFactory:
 
     @staticmethod
     def generate(gspn_parameters, repository_folder):
-        numbers = PlainModelFactory.get_sensor_number(gspn_parameters)
+        numbers: int = PlainModelFactory.get_sensor_number(gspn_parameters)
         default = PlainModelFactory.model_kb[numbers].get('default')
         scheduling_policy = gspn_parameters['scheduler']['kind']
-        model_name, configuration_label = PlainModelFactory.model_kb[numbers].get(scheduling_policy, default)
+        model_name, configuration_label, measures_label = PlainModelFactory.model_kb[numbers].get(scheduling_policy, default)
         configuration = PlainModelFactory.configurations[configuration_label]
+        measures = PlainModelFactory.measures[measures_label]
         for key in configuration.keys():
             func = configuration[key]
             value = func(gspn_parameters)
             configuration[key] = value
-        engine = Engine(model_name, repository_folder, configuration, gspn_parameters)
+        engine = Engine(model_name, repository_folder, configuration, measures, gspn_parameters)
         return engine

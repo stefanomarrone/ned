@@ -6,10 +6,11 @@ import ctypes
 
 
 class Engine:
-    def __init__(self, model, model_repo, configuration, gspn_parameters = None):
+    def __init__(self, model, model_repo, configuration, measures, gspn_parameters = None):
         self.model = model
         self.model_configuration = configuration
         self.model_repo = model_repo
+        self.measures = measures
         config = Configuration()
         self.gspn_bin_path = config.get('greatspn')  # todo: use the parameter and make run general
         self.gspn_parameters = gspn_parameters
@@ -23,13 +24,17 @@ class Engine:
     def execute(self):
         generic_analysis(self.model, self.model_repo, self.getParamList())
 
-    def safety(self, node_name):
-        if self.gspn_parameters is not None:
-            return self.__c_readtpd_wrapper(node_name) * self.gspn_parameters['process']['deactivation_rate']
-        print("No global parameters injected")
+    def safety(self):
+        transition_names = self.measures['safety']
+        values = list(map(self.get_throughput,transition_names))
+        retval = 1 / sum(values)
+        return retval
 
     def sustainability(self):
-        pass
+        place_names = self.measures['sustainability']
+        values = list(map(self.__c_readtpd_wrapper,place_names))
+        retval = 1 / (sum(values) / len(values))
+        return retval
 
     def __c_readtpd_wrapper(self, node_name) -> float:
         c_library = ctypes.CDLL(f'{os.getcwd()}/gspn_model/readtpd.so')
@@ -55,3 +60,20 @@ class Engine:
                 raise "Node not found"
         except FileNotFoundError:
             print("File not found")
+
+    def get_throughput(self, transition_name: str) -> float:
+        line_header = 'Thru_' + transition_name
+        netpath = f'{os.getcwd()}/{self.model_repo}/{self.model}_analysis'
+        trovato: bool = False
+        retval = None
+        try:
+            with open(f'{netpath}/{self.model}.sta', 'r') as grg_file:
+                while (not trovato):
+                    line = grg_file.__next__()
+                    if line_header in line:
+                        elements = line.split(' ')
+                        retval = float(elements[2])
+                        trovato = True
+        except FileNotFoundError:
+            print("File not found")
+        return retval
