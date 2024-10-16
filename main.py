@@ -85,9 +85,15 @@ def core(configuration_filename, draw_flag):
             error = activation_rate == 0 or deactivation_rate == 0
             global_parameters = make_global_parameters(analysis, activation_rate, deactivation_rate, config)
             gspn_repo = config.get('greatspn_repos')
-            engine = PlainModelFactory.generate(global_parameters, gspn_repo)
-            engine.execute()
-            safety_measure = engine.safety()
+            engine: Engine = PlainModelFactory.generate(global_parameters, gspn_repo)
+            try:
+                engine.execute()
+            except Exception as e:
+                if type(e) is FileNotFoundError:
+                    print(e)
+                else:
+                    raise
+            safety_measure = engine.safety(node_name='Active')  # mean* global_parameters['numero'];
             sustainability_measure = engine.sustainability()
             # gspn_naive_handle.one_sensor_analysis()
     if draw_flag:

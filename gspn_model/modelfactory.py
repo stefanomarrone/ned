@@ -99,5 +99,5 @@ class PlainModelFactory:
             func = configuration[key]
             value = func(gspn_parameters)
             configuration[key] = value
-        engine = Engine(model_name, repository_folder, configuration)
+        engine = Engine(model_name, repository_folder, configuration, gspn_parameters)
         return engine
