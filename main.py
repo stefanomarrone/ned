@@ -86,13 +86,7 @@ def core(configuration_filename, draw_flag):
             global_parameters = make_global_parameters(analysis, activation_rate, deactivation_rate, config)
             gspn_repo = config.get('greatspn_repos')
             engine: Engine = PlainModelFactory.generate(global_parameters, gspn_repo)
-            try:
-                engine.execute()
-            except Exception as e:
-                if type(e) is FileNotFoundError:
-                    print(e)
-                else:
-                    raise
+            engine.execute()
             safety_measure = engine.safety()  # mean* global_parameters['numero'];
             sustainability_measure = engine.sustainability()
     if draw_flag:
@@ -109,4 +103,3 @@ if __name__ == '__main__':
         mtot, isl = core(configuration_filename, drawing_flag)
         print(f'MToT = {mtot}')
         print(f'ISL = {isl}')
-

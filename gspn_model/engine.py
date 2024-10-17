@@ -1,12 +1,12 @@
 import os
 
-from gspn_model.gspn_naive_handle import generic_analysis
+from gspn_model.gspn_naive_handle import GSPN_handler
 from utils.configuration import Configuration
 import ctypes
 
 
 class Engine:
-    def __init__(self, model, model_repo, configuration, measures, gspn_parameters = None):
+    def __init__(self, model, model_repo, configuration, measures, gspn_parameters=None):
         self.model = model
         self.model_configuration = configuration
         self.model_repo = model_repo
@@ -14,6 +14,7 @@ class Engine:
         config = Configuration()
         self.gspn_bin_path = config.get('greatspn')  # todo: use the parameter and make run general
         self.gspn_parameters = gspn_parameters
+        self.gspn_handler: GSPN_handler = GSPN_handler(greatspn_scripts=self.gspn_bin_path)
 
     def getParamList(self):
         retval = list()
@@ -22,17 +23,17 @@ class Engine:
         return retval
 
     def execute(self):
-        generic_analysis(self.model, self.model_repo, self.getParamList())
+        self.gspn_handler.generic_analysis(self.model, self.model_repo, self.getParamList())
 
     def safety(self):
         transition_names = self.measures['safety']
-        values = list(map(self.get_throughput,transition_names))
+        values = list(map(self.get_throughput, transition_names))
         retval = 1 / sum(values)
         return retval
 
     def sustainability(self):
         place_names = self.measures['sustainability']
-        values = list(map(self.__c_readtpd_wrapper,place_names))
+        values = list(map(self.__c_readtpd_wrapper, place_names))
         retval = 1 / (sum(values) / len(values))
         return retval
 
@@ -57,7 +58,7 @@ class Engine:
                 avg = get_average_wrapper(netname_bytes, node_id)
                 return avg
             else:
-                raise "Node not found"
+                raise Exception("Node not found")
         except FileNotFoundError:
             print("File not found")
 
@@ -74,6 +75,9 @@ class Engine:
                         elements = line.split(' ')
                         retval = float(elements[2])
                         trovato = True
+            if trovato is False:
+                print(f'Error {transition_name}')
+                raise Exception('Thru not found')
         except FileNotFoundError:
             print("File not found")
         return retval
