@@ -34,7 +34,8 @@ class Engine:
     def sustainability(self):
         place_names = self.measures['sustainability']
         values = list(map(self.__c_readtpd_wrapper, place_names))
-        retval = 1 / (sum(values) / len(values))
+        values = list(map(lambda x: 1 / x, values))
+        retval = min(values)
         return retval
 
     def __c_readtpd_wrapper(self, node_name) -> float:
