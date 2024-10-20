@@ -4,17 +4,17 @@
     <nodes>
       <place label-x="-2.5" label-y="-1.5" marking="1" name="no_event" superpos-y="1.5" x="6.0" y="10.0"/>
       <transition delay="EventStartRate" delay-x="-1.5" delay-y="1.5" name="activation" nservers-x="0.5" type="EXP" x="10.55" y="10.0"/>
-      <place label-x="-2.5" label-y="-1.5" name="active" superpos-y="1.5" superposition-tags="request" x="18.0" y="10.0"/>
+      <place label-x="-2.5" label-y="-1.5" name="hazard" superpos-y="1.5" superposition-tags="request" x="18.0" y="10.0"/>
       <transition delay="EventEndRate" delay-x="-2.0" delay-y="1.5" name="deactivation" nservers-x="0.5" type="EXP" x="22.55" y="10.0"/>
-      <template name="EventStartRate" type="REAL" x="2.0" y="19.0"/>
-      <template name="EventEndRate" type="REAL" x="2.0" y="17.0"/>
+      <template name="EventStartRate" type="REAL" x="11.0" y="3.0"/>
+      <template name="EventEndRate" type="REAL" x="11.0" y="5.0"/>
       <transition label-x="-2.5" label-y="0.0" name="reboot" rotation="1.5707963267948966" type="IMM" x="6.85" y="6.0"/>
-      <place label-x="-3.0" label-y="0.0" name="cleaning" superpos-x="-2.0" superpos-y="1.0" superposition-tags="reset" x="6.0" y="2.0"/>
+      <place label-x="-3.0" label-y="0.0" name="cleaning" superpos-x="-2.0" superpos-y="1.0" superposition-tags="reset" x="6.0" y="3.0"/>
     </nodes>
     <edges>
       <arc head="activation" kind="INPUT" tail="no_event"/>
-      <arc head="active" kind="OUTPUT" tail="activation"/>
-      <arc head="deactivation" kind="INPUT" tail="active"/>
+      <arc head="hazard" kind="OUTPUT" tail="activation"/>
+      <arc head="deactivation" kind="INPUT" tail="hazard"/>
       <arc head="no_event" kind="OUTPUT" mult-k="0.50009765625" mult-x="0.6478902170605423" mult-y="1.4591560868242173" tail="deactivation">
         <point x="25.5" y="11.0"/>
         <point x="25.5" y="14.0"/>
@@ -29,17 +29,18 @@
   <gspn name="sensor" show-color-cmd="false" show-fluid-cmd="false" zoom="200">
     <nodes>
       <place label-x="-2.0" label-y="-1.5" name="sensing" x="16.0" y="7.0"/>
-      <transition label-x="-1.5" label-y="0.0" name="able" rotation="-0.0" type="IMM" weight="DetectionProb" weight-x="2.5" weight-y="-2.0" x="10.85" y="14.0"/>
+      <transition label-x="-1.5" label-y="0.0" name="able" rotation="-0.0" type="IMM" weight="DetectionProb" weight-x="4.0" weight-y="-2.0" x="10.85" y="14.0"/>
       <transition label-y="1.5" name="switch_on" superpos-x="1.0" superpos-y="0.5" type="IMM" x="20.85" y="7.0"/>
       <transition label-x="-2.0" name="switch_off" superpos-x="1.0" superpos-y="0.5" type="IMM" x="20.85" y="3.0"/>
       <place label-y="-1.5" name="on_command" superpos-y="1.5" superposition-tags="on" x="23.0" y="7.0"/>
       <place label-y="-1.5" name="off_command" superpos-y="1.5" superposition-tags="off" x="23.0" y="3.0"/>
       <transition label-y="-1.0" name="flushing" rotation="1.5707963267948966" superpos-x="2.0" superpos-y="0.5" type="IMM" x="16.85" y="11.0"/>
-      <template name="DetectionProb" type="REAL" x="24.0" y="18.0"/>
-      <transition label-x="2.0" label-y="0.0" name="unable" rotation="-0.0" type="IMM" weight="1-DetectionProb" weight-x="8.5" weight-y="-2.0" x="22.85" y="14.0"/>
-      <place label-x="2.5" label-y="0.0" name="process" superpos-y="1.5" superposition-tags="request" x="16.0" y="19.0"/>
+      <template name="DetectionProb" type="REAL" x="8.0" y="2.0"/>
+      <transition label-x="2.0" label-y="0.0" name="unable" rotation="-0.0" type="IMM" weight="UnDetectionProb" weight-x="3.5" weight-y="-2.0" x="22.85" y="14.0"/>
+      <place label-x="2.5" label-y="0.0" name="hazard" superpos-y="1.5" superposition-tags="request" x="16.0" y="18.0"/>
       <place name="used" x="16.0" y="14.0"/>
-      <place label-x="-2.0" label-y="-1.5" name="resetting" superpos-y="1.5" superposition-tags="reset" x="10.0" y="19.0"/>
+      <place label-x="-2.0" label-y="-1.5" name="resetting" superpos-y="1.5" superposition-tags="reset" x="10.0" y="18.0"/>
+      <template name="UnDetectionProb" type="REAL" x="8.0" y="4.0"/>
     </nodes>
     <edges>
       <arc head="able" kind="INPUT" tail="sensing"/>
@@ -51,47 +52,47 @@
       <arc head="sensing" kind="OUTPUT" tail="able"/>
       <arc head="unable" kind="INPUT" tail="sensing"/>
       <arc head="sensing" kind="OUTPUT" tail="unable"/>
-      <arc head="unable" kind="INPUT" tail="process"/>
-      <arc head="process" kind="OUTPUT" tail="unable"/>
+      <arc head="unable" kind="INPUT" tail="hazard"/>
+      <arc head="hazard" kind="OUTPUT" tail="unable"/>
       <arc head="used" kind="OUTPUT" tail="unable"/>
       <arc head="unable" kind="INHIBITOR" tail="used"/>
       <arc head="able" kind="INHIBITOR" tail="used"/>
       <arc head="flushing" kind="INPUT" tail="used"/>
-      <arc head="able" kind="INPUT" tail="process"/>
+      <arc head="able" kind="INPUT" tail="hazard"/>
       <arc head="resetting" kind="OUTPUT" tail="able"/>
     </edges>
   </gspn>
-  <gspn name="scheduler" show-color-cmd="false" show-fluid-cmd="false" zoom="200">
+  <gspn name="scheduler" show-color-cmd="false" show-fluid-cmd="false" zoom="125">
     <nodes>
-      <place label-x="2.5" label-y="0.0" marking="1" name="Idle" x="16.0" y="8.0"/>
-      <place label-x="-2.5" label-y="0.0" name="Active" x="11.0" y="8.0"/>
-      <transition delay="OnRate" delay-x="0.0" delay-y="1.5" label-x="-1.0" label-y="-1.0" name="on" nservers-x="0.5" rotation="1.5707963267948966" type="EXP" x="11.55" y="13.0"/>
-      <transition delay="OffRate" delay-x="1.0" name="off" nservers-x="0.5" rotation="1.5707963267948966" type="EXP" x="11.55" y="3.0"/>
-      <place label-y="-2.0" name="SendingOff" superpos-y="2.0" superposition-tags="off" x="6.0" y="3.0"/>
-      <place label-y="-2.0" name="SendingOn" superpos-y="1.5" superposition-tags="on" x="6.0" y="13.0"/>
-      <template last-binding="0.0" name="OnRate" type="REAL" x="1.0" y="6.0"/>
-      <template last-binding="0.0" name="OffRate" type="REAL" x="1.0" y="8.0"/>
+      <place label-x="2.5" label-y="0.0" marking="1" name="idle" x="16.0" y="8.0"/>
+      <place label-x="-2.5" label-y="0.0" name="active" x="11.0" y="8.0"/>
+      <transition delay="OnRate" delay-x="0.0" delay-y="1.5" label-x="-1.0" label-y="-1.0" name="on" nservers-x="0.5" rotation="1.5707963267948966" type="EXP" x="11.55" y="11.0"/>
+      <transition delay="OffRate" delay-x="1.0" name="off" nservers-x="0.5" rotation="1.5707963267948966" type="EXP" x="11.55" y="5.0"/>
+      <place label-y="-2.0" name="sending_off" superpos-y="2.0" superposition-tags="off" x="6.0" y="5.0"/>
+      <place label-y="-2.0" name="sending_on" superpos-y="1.5" superposition-tags="on" x="6.0" y="11.0"/>
+      <template last-binding="0.0" name="OnRate" type="REAL" x="18.0" y="6.0"/>
+      <template last-binding="0.0" name="OffRate" type="REAL" x="18.0" y="12.0"/>
     </nodes>
     <edges>
-      <arc head="on" kind="INPUT" mult-k="1.1291992187500002" tail="Idle">
-        <point x="16.85986328125" y="14.068164062500001"/>
+      <arc head="on" kind="INPUT" mult-k="1.1291992187500002" tail="idle">
+        <point x="17.0" y="12.0"/>
       </arc>
-      <arc head="Active" kind="OUTPUT" tail="on"/>
-      <arc head="off" kind="INPUT" tail="Active"/>
-      <arc head="Idle" kind="OUTPUT" mult-k="1.4737304687500004" tail="off">
-        <point x="17.0" y="4.0"/>
+      <arc head="active" kind="OUTPUT" tail="on"/>
+      <arc head="off" kind="INPUT" tail="active"/>
+      <arc head="idle" kind="OUTPUT" mult-k="1.4737304687500004" tail="off">
+        <point x="17.0" y="6.0"/>
       </arc>
-      <arc head="SendingOff" kind="OUTPUT" tail="off"/>
-      <arc head="SendingOn" kind="OUTPUT" tail="on"/>
+      <arc head="sending_off" kind="OUTPUT" tail="off"/>
+      <arc head="sending_on" kind="OUTPUT" tail="on"/>
     </edges>
   </gspn>
   <gspn name="one_sensor" show-color-cmd="false" show-fluid-cmd="false" zoom="200">
     <nodes>
-      <place label-x="-2.5" label-y="-1.5" marking="1" name="no_event" superpos-y="1.5" x="7.0" y="23.0"/>
-      <transition delay="EventStartRate" delay-x="-1.5" delay-y="1.5" name="activation" nservers-x="0.5" type="EXP" x="11.55" y="23.0"/>
-      <transition delay="EventEndRate" delay-x="-2.0" delay-y="1.5" name="deactivation" nservers-x="0.5" type="EXP" x="28.55" y="23.0"/>
-      <template last-binding="0.05" name="EventStartRate" type="REAL" x="35.0" y="23.0"/>
-      <template last-binding="0.001" name="EventEndRate" type="REAL" x="35.0" y="21.0"/>
+      <place label-x="-2.5" label-y="-1.5" marking="1" name="no_event" superpos-y="1.5" x="7.0" y="21.0"/>
+      <transition delay="EventStartRate" delay-x="-1.5" delay-y="1.5" name="activation" nservers-x="0.5" type="EXP" x="11.55" y="21.0"/>
+      <transition delay="EventEndRate" delay-x="-2.0" delay-y="1.5" name="deactivation" nservers-x="0.5" type="EXP" x="28.55" y="21.0"/>
+      <template last-binding="0.05" name="EventStartRate" type="REAL" x="37.0" y="9.0"/>
+      <template last-binding="0.001" name="EventEndRate" type="REAL" x="37.0" y="7.0"/>
       <place label-x="-2.0" label-y="-1.5" name="sensing" x="13.0" y="10.0"/>
       <transition label-x="-1.5" label-y="0.0" name="able" rotation="-0.0" type="IMM" weight="DetectionProb" weight-x="2.5" weight-y="-2.0" x="7.85" y="17.0"/>
       <transition label-y="1.5" name="switch_on" superpos-x="1.0" superpos-y="0.5" type="IMM" x="17.85" y="10.0"/>
@@ -99,28 +100,28 @@
       <place label-y="-1.5" name="on_command" superpos-y="1.5" superposition-tags="on" x="20.0" y="10.0"/>
       <place label-y="-1.5" name="off_command" superpos-y="1.5" superposition-tags="off" x="20.0" y="6.0"/>
       <transition label-y="-1.0" name="flushing" rotation="1.5707963267948966" superpos-x="2.0" superpos-y="0.5" type="IMM" x="13.85" y="14.0"/>
-      <template last-binding="0.6" name="DetectionProb" type="REAL" x="35.0" y="19.0"/>
-      <transition label-x="2.0" label-y="0.0" name="unable" rotation="-0.0" type="IMM" weight="UnDetectionProb" weight-x="8.5" weight-y="-2.0" x="19.85" y="17.0"/>
-      <place label-x="2.5" label-y="-1.0" name="process" superpos-y="1.5" superposition-tags="request" x="19.0" y="23.0"/>
+      <template last-binding="0.6" name="DetectionProb" type="REAL" x="37.0" y="5.0"/>
+      <transition label-x="2.0" label-y="0.0" name="unable" rotation="-0.0" type="IMM" weight="UnDetectionProb" weight-x="6.0" weight-y="-2.0" x="19.85" y="17.0"/>
+      <place label-x="2.5" label-y="-1.0" name="hazard" superpos-y="1.5" superposition-tags="request" x="19.0" y="21.0"/>
       <place name="used" x="13.0" y="17.0"/>
-      <place label-x="2.5" label-y="0.0" marking="1" name="Idle" x="41.0" y="10.0"/>
-      <place label-x="-2.5" label-y="0.0" name="Active" x="36.0" y="10.0"/>
-      <transition delay="InRate" delay-x="0.0" delay-y="1.5" label-x="-1.0" label-y="-1.0" name="on" nservers-x="0.5" rotation="1.5707963267948966" type="EXP" x="36.55" y="15.0"/>
-      <transition delay="OffRate" delay-x="1.0" name="off" nservers-x="0.5" rotation="1.5707963267948966" type="EXP" x="36.55" y="5.0"/>
-      <template last-binding="0.1" name="InRate" type="REAL" x="35.0" y="25.0"/>
-      <template last-binding="1" name="OffRate" type="REAL" x="35.0" y="27.0"/>
-      <template last-binding="0.6" name="UnDetectionProb" type="REAL" x="26.0" y="19.0"/>
+      <place label-x="2.5" label-y="0.0" marking="1" name="idle" x="32.0" y="8.0"/>
+      <place label-x="-2.5" label-y="0.0" name="active" x="27.0" y="8.0"/>
+      <transition delay="InRate" delay-x="0.0" delay-y="1.5" label-x="-1.0" label-y="-1.0" name="on" nservers-x="0.5" rotation="1.5707963267948966" type="EXP" x="27.55" y="13.0"/>
+      <transition delay="OffRate" delay-x="1.0" name="off" nservers-x="0.5" rotation="1.5707963267948966" type="EXP" x="27.55" y="3.0"/>
+      <template last-binding="0.1" name="InRate" type="REAL" x="37.0" y="11.0"/>
+      <template last-binding="1" name="OffRate" type="REAL" x="37.0" y="13.0"/>
+      <template last-binding="0.6" name="UnDetectionProb" type="REAL" x="37.0" y="15.0"/>
     </nodes>
     <edges>
       <arc head="activation" kind="INPUT" tail="no_event"/>
-      <arc head="process" kind="OUTPUT" tail="activation"/>
-      <arc head="deactivation" kind="INPUT" tail="process"/>
+      <arc head="hazard" kind="OUTPUT" tail="activation"/>
+      <arc head="deactivation" kind="INPUT" tail="hazard"/>
       <arc head="no_event" kind="OUTPUT" mult-k="0.50009765625" mult-x="0.6478902170605423" mult-y="1.4591560868242173" tail="deactivation">
-        <point x="31.5" y="24.0"/>
-        <point x="31.5" y="27.0"/>
-        <point x="5.5" y="27.0"/>
-        <point x="5.50449259402326" y="25.637405493841477"/>
-        <point x="5.5" y="24.0"/>
+        <point x="31.5" y="22.0"/>
+        <point x="31.5" y="25.0"/>
+        <point x="5.5" y="25.0"/>
+        <point x="5.50449259402326" y="23.637405493841477"/>
+        <point x="5.5" y="22.0"/>
       </arc>
       <arc head="able" kind="INPUT" tail="sensing"/>
       <arc head="sensing" kind="OUTPUT" tail="switch_on"/>
@@ -131,73 +132,73 @@
       <arc head="sensing" kind="OUTPUT" tail="able"/>
       <arc head="unable" kind="INPUT" tail="sensing"/>
       <arc head="sensing" kind="OUTPUT" tail="unable"/>
-      <arc head="unable" kind="INPUT" tail="process"/>
-      <arc head="process" kind="OUTPUT" tail="unable"/>
+      <arc head="unable" kind="INPUT" tail="hazard"/>
+      <arc head="hazard" kind="OUTPUT" tail="unable"/>
       <arc head="used" kind="OUTPUT" tail="unable"/>
       <arc head="unable" kind="INHIBITOR" tail="used"/>
       <arc head="able" kind="INHIBITOR" tail="used"/>
       <arc head="flushing" kind="INPUT" tail="used"/>
-      <arc head="able" kind="INPUT" tail="process"/>
-      <arc head="on" kind="INPUT" mult-k="1.1291992187500002" tail="Idle">
-        <point x="41.85986328125" y="16.068164062500003"/>
+      <arc head="able" kind="INPUT" tail="hazard"/>
+      <arc head="on" kind="INPUT" mult-k="1.1291992187500002" tail="idle">
+        <point x="32.85986328125" y="14.068164062500003"/>
       </arc>
-      <arc head="Active" kind="OUTPUT" tail="on"/>
-      <arc head="off" kind="INPUT" tail="Active"/>
-      <arc head="Idle" kind="OUTPUT" mult-k="1.4737304687500004" tail="off">
-        <point x="42.0" y="6.0"/>
+      <arc head="active" kind="OUTPUT" tail="on"/>
+      <arc head="off" kind="INPUT" tail="active"/>
+      <arc head="idle" kind="OUTPUT" mult-k="1.4737304687500004" tail="off">
+        <point x="33.0" y="4.0"/>
       </arc>
       <arc head="off_command" kind="OUTPUT" tail="off"/>
       <arc head="on_command" kind="OUTPUT" tail="on"/>
       <arc head="no_event" kind="OUTPUT" tail="able"/>
     </edges>
   </gspn>
-  <gspn name="two_sensor" show-color-cmd="false" show-fluid-cmd="false" zoom="125">
+  <gspn name="two_sensors" show-color-cmd="false" show-fluid-cmd="false" zoom="125">
     <nodes>
       <place label-x="-2.5" label-y="-1.5" marking="1" name="no_event" superpos-y="1.5" x="14.0" y="25.0"/>
       <transition delay="EventStartRate" delay-x="-1.5" delay-y="1.5" name="activation" nservers-x="0.5" type="EXP" x="18.55" y="25.0"/>
       <transition delay="EventEndRate" delay-x="-2.0" delay-y="1.5" name="deactivation" nservers-x="0.5" type="EXP" x="35.55" y="25.0"/>
       <template last-binding="0.05" name="EventStartRate" type="REAL" x="2.0" y="6.0"/>
       <template last-binding="0.001" name="EventEndRate" type="REAL" x="2.0" y="4.0"/>
-      <place label-x="-2.0" label-y="-1.5" name="sensing" x="13.0" y="10.0"/>
-      <transition label-x="-1.5" label-y="0.0" name="able" rotation="-0.0" type="IMM" weight="DetectionProb_1" weight-x="2.5" weight-y="-2.0" x="7.85" y="17.0"/>
-      <transition label-y="1.5" name="switch_on" superpos-x="1.0" superpos-y="0.5" type="IMM" x="17.85" y="10.0"/>
-      <transition label-x="-2.0" name="switch_off" superpos-x="1.0" superpos-y="0.5" type="IMM" x="17.85" y="6.0"/>
-      <place label-y="-1.5" name="on_command" superpos-y="1.5" superposition-tags="on" x="20.0" y="10.0"/>
-      <place label-y="-1.5" name="off_command" superpos-y="1.5" superposition-tags="off" x="20.0" y="6.0"/>
-      <transition label-y="-1.0" name="flushing" rotation="1.5707963267948966" superpos-x="2.0" superpos-y="0.5" type="IMM" x="13.85" y="14.0"/>
+      <place label-x="-2.0" label-y="-1.5" name="sensing_1" x="13.0" y="10.0"/>
+      <transition label-x="-1.5" label-y="0.0" name="able_1" rotation="-0.0" type="IMM" weight="DetectionProb_1" weight-x="2.5" weight-y="-2.0" x="7.85" y="17.0"/>
+      <transition label-y="1.5" name="switch_on_1" superpos-x="1.0" superpos-y="0.5" type="IMM" x="17.85" y="10.0"/>
+      <transition label-x="-2.0" name="switch_off_1" superpos-x="1.0" superpos-y="0.5" type="IMM" x="17.85" y="6.0"/>
+      <place label-y="-1.5" name="on_command_1" superpos-y="1.5" superposition-tags="on" x="21.0" y="10.0"/>
+      <place label-y="-1.5" name="off_command_1" superpos-y="1.5" superposition-tags="off" x="21.0" y="6.0"/>
+      <transition label-y="-1.0" name="flushing_1" rotation="1.5707963267948966" superpos-x="2.0" superpos-y="0.5" type="IMM" x="13.85" y="14.0"/>
       <template last-binding="0.6" name="DetectionProb_1" type="REAL" x="2.0" y="25.0"/>
-      <transition label-x="2.0" label-y="0.0" name="unable" rotation="-0.0" type="IMM" weight="UnDetectionProb_1" weight-x="8.5" weight-y="-2.0" x="19.85" y="17.0"/>
-      <place label-x="2.5" label-y="-1.0" name="process" superpos-y="1.5" superposition-tags="request" x="26.0" y="25.0"/>
-      <place name="used" x="13.0" y="17.0"/>
-      <place label-x="2.5" label-y="0.0" marking="1" name="Idle" x="32.0" y="8.0"/>
-      <place label-x="-2.5" label-y="0.0" name="Active" x="27.0" y="8.0"/>
+      <transition label-x="2.0" label-y="0.0" name="unable_1" rotation="-0.0" type="IMM" weight="UnDetectionProb_1" weight-x="5.0" weight-y="-2.0" x="19.85" y="17.0"/>
+      <place label-x="2.5" label-y="-1.0" name="hazard" superpos-y="1.5" superposition-tags="request" x="26.0" y="25.0"/>
+      <place name="used_1" x="13.0" y="17.0"/>
+      <place label-x="2.5" label-y="0.0" marking="1" name="idle_1" x="32.0" y="8.0"/>
+      <place label-x="-2.5" label-y="0.0" name="active_1" x="27.0" y="8.0"/>
       <transition delay="InRate" delay-x="0.0" delay-y="1.5" label-x="-1.0" label-y="-1.0" name="on" nservers-x="0.5" rotation="1.5707963267948966" type="EXP" x="27.55" y="13.0"/>
-      <transition delay="OffRate" delay-x="1.0" name="off" nservers-x="0.5" rotation="1.5707963267948966" type="EXP" x="27.55" y="3.0"/>
+      <transition delay="OffRate" delay-x="1.0" name="off_1" nservers-x="0.5" rotation="1.5707963267948966" type="EXP" x="27.55" y="3.0"/>
       <template last-binding="0.1" name="InRate" type="REAL" x="2.0" y="8.0"/>
       <template last-binding="1" name="OffRate" type="REAL" x="2.0" y="10.0"/>
-      <place label-x="-2.0" label-y="-1.5" name="copy_sensing" x="40.0" y="13.0"/>
-      <transition label-x="-1.5" label-y="0.0" name="copy_able" rotation="-0.0" type="IMM" weight="DetectionProb_2" weight-x="2.5" weight-y="-2.0" x="34.85" y="20.0"/>
-      <transition label-y="1.5" name="copy_switch_on" superpos-x="1.0" superpos-y="0.5" type="IMM" x="44.85" y="13.0"/>
-      <transition label-x="-2.0" name="copy_switch_off" superpos-x="1.0" superpos-y="0.5" type="IMM" x="44.85" y="9.0"/>
-      <place label-y="-1.5" name="copy_on_command" superpos-y="1.5" superposition-tags="on" x="47.0" y="13.0"/>
-      <place label-y="-1.5" name="copy_off_command" superpos-y="1.5" superposition-tags="off" x="47.0" y="9.0"/>
-      <transition label-y="-1.0" name="copy_flushing" rotation="1.5707963267948966" superpos-x="2.0" superpos-y="0.5" type="IMM" x="40.85" y="17.0"/>
-      <template name="DetectionProb_2" type="REAL" x="46.0" y="25.0"/>
-      <transition label-x="2.0" label-y="0.0" name="copy_unable" rotation="-0.0" type="IMM" weight="UnDetectionProb_2" weight-x="8.5" weight-y="-2.0" x="46.85" y="20.0"/>
-      <place name="copy_used" x="40.0" y="20.0"/>
-      <place label-x="2.5" label-y="0.0" marking="1" name="copy_Idle" x="60.0" y="11.0"/>
-      <place label-x="-2.5" label-y="0.0" name="copy_Active" x="55.0" y="11.0"/>
-      <transition delay="InRate_2" delay-x="0.0" delay-y="1.5" label-x="-1.0" label-y="-1.0" name="copy_on" nservers-x="0.5" rotation="1.5707963267948966" type="EXP" x="55.55" y="16.0"/>
-      <transition delay="OffRate_2" delay-x="1.0" name="copy_off" nservers-x="0.5" rotation="1.5707963267948966" type="EXP" x="55.55" y="6.0"/>
-      <template last-binding="0.0" name="InRate_2" type="REAL" x="38.0" y="5.0"/>
-      <template last-binding="0.0" name="OffRate_2" type="REAL" x="38.0" y="3.0"/>
+      <place label-x="-2.0" label-y="-1.5" name="sensing_2" x="40.0" y="13.0"/>
+      <transition label-x="-2.0" label-y="-0.5" name="able_2" rotation="-0.0" type="IMM" weight="DetectionProb_2" weight-x="2.5" weight-y="-2.0" x="34.85" y="20.0"/>
+      <transition label-y="1.5" name="switch_on_2" superpos-x="1.0" superpos-y="0.5" type="IMM" x="44.85" y="13.0"/>
+      <transition label-x="-2.0" name="switch_off_2" superpos-x="1.0" superpos-y="0.5" type="IMM" x="42.85" y="9.0"/>
+      <place label-y="-1.5" name="on_command_2" superpos-y="1.5" superposition-tags="on" x="49.0" y="13.0"/>
+      <place label-y="-1.5" name="off_command_2" superpos-y="1.5" superposition-tags="off" x="49.0" y="9.0"/>
+      <transition label-y="-1.0" name="flushing_2" rotation="1.5707963267948966" superpos-x="2.0" superpos-y="0.5" type="IMM" x="40.85" y="17.0"/>
+      <template name="DetectionProb_2" type="REAL" x="42.0" y="25.0"/>
+      <transition label-x="2.0" label-y="0.0" name="unable_2" rotation="-0.0" type="IMM" weight="UnDetectionProb_2" weight-x="8.5" weight-y="-2.0" x="46.85" y="20.0"/>
+      <place name="used_2" x="40.0" y="20.0"/>
+      <place label-x="2.5" label-y="0.0" marking="1" name="idle_2" x="60.0" y="11.0"/>
+      <place label-x="-2.5" label-y="0.0" name="active_2" x="55.0" y="11.0"/>
+      <transition delay="InRate_2" delay-x="0.0" delay-y="1.5" label-x="-1.0" label-y="-1.0" name="on_2" nservers-x="0.5" rotation="1.5707963267948966" type="EXP" x="55.55" y="16.0"/>
+      <transition delay="OffRate_2" delay-x="1.0" name="off_2" nservers-x="0.5" rotation="1.5707963267948966" type="EXP" x="55.55" y="6.0"/>
+      <template last-binding="0.0" name="InRate_2" type="REAL" x="51.0" y="25.0"/>
+      <template last-binding="0.0" name="OffRate_2" type="REAL" x="51.0" y="28.0"/>
       <template last-binding="0.6" name="UnDetectionProb_1" type="REAL" x="2.0" y="28.0"/>
-      <template name="UnDetectionProb_2" type="REAL" x="46.0" y="28.0"/>
+      <template name="UnDetectionProb_2" type="REAL" x="41.0" y="28.0"/>
     </nodes>
     <edges>
       <arc head="activation" kind="INPUT" tail="no_event"/>
-      <arc head="process" kind="OUTPUT" tail="activation"/>
-      <arc head="deactivation" kind="INPUT" tail="process"/>
+      <arc head="hazard" kind="OUTPUT" tail="activation"/>
+      <arc head="deactivation" kind="INPUT" tail="hazard"/>
       <arc head="no_event" kind="OUTPUT" mult-k="0.50009765625" mult-x="0.6478902170605423" mult-y="1.4591560868242173" tail="deactivation">
         <point x="38.5" y="26.0"/>
         <point x="38.5" y="29.0"/>
@@ -205,60 +206,285 @@
         <point x="12.50449259402326" y="27.637405493841477"/>
         <point x="12.5" y="26.0"/>
       </arc>
-      <arc head="able" kind="INPUT" tail="sensing"/>
-      <arc head="sensing" kind="OUTPUT" tail="switch_on"/>
-      <arc head="switch_off" kind="INPUT" tail="sensing"/>
-      <arc head="switch_off" kind="INPUT" tail="off_command"/>
-      <arc head="switch_on" kind="INPUT" tail="on_command"/>
-      <arc head="flushing" kind="INHIBITOR" tail="sensing"/>
-      <arc head="sensing" kind="OUTPUT" tail="able"/>
-      <arc head="unable" kind="INPUT" tail="sensing"/>
-      <arc head="sensing" kind="OUTPUT" tail="unable"/>
-      <arc head="unable" kind="INPUT" tail="process"/>
-      <arc head="process" kind="OUTPUT" tail="unable"/>
-      <arc head="used" kind="OUTPUT" tail="unable"/>
-      <arc head="unable" kind="INHIBITOR" tail="used"/>
-      <arc head="able" kind="INHIBITOR" tail="used"/>
-      <arc head="flushing" kind="INPUT" tail="used"/>
-      <arc head="able" kind="INPUT" tail="process"/>
-      <arc head="on" kind="INPUT" mult-k="1.1291992187500002" tail="Idle">
+      <arc head="able_1" kind="INPUT" tail="sensing_1"/>
+      <arc head="sensing_1" kind="OUTPUT" tail="switch_on_1"/>
+      <arc head="switch_off_1" kind="INPUT" tail="sensing_1"/>
+      <arc head="switch_off_1" kind="INPUT" tail="off_command_1"/>
+      <arc head="switch_on_1" kind="INPUT" tail="on_command_1"/>
+      <arc head="flushing_1" kind="INHIBITOR" tail="sensing_1"/>
+      <arc head="sensing_1" kind="OUTPUT" tail="able_1"/>
+      <arc head="unable_1" kind="INPUT" tail="sensing_1"/>
+      <arc head="sensing_1" kind="OUTPUT" tail="unable_1"/>
+      <arc head="unable_1" kind="INPUT" tail="hazard"/>
+      <arc head="hazard" kind="OUTPUT" tail="unable_1"/>
+      <arc head="used_1" kind="OUTPUT" tail="unable_1"/>
+      <arc head="unable_1" kind="INHIBITOR" tail="used_1"/>
+      <arc head="able_1" kind="INHIBITOR" tail="used_1"/>
+      <arc head="flushing_1" kind="INPUT" tail="used_1"/>
+      <arc head="able_1" kind="INPUT" tail="hazard"/>
+      <arc head="on" kind="INPUT" mult-k="1.1291992187500002" tail="idle_1">
         <point x="32.85986328125" y="14.068164062500003"/>
       </arc>
-      <arc head="Active" kind="OUTPUT" tail="on"/>
-      <arc head="off" kind="INPUT" tail="Active"/>
-      <arc head="Idle" kind="OUTPUT" mult-k="1.4737304687500004" tail="off">
+      <arc head="active_1" kind="OUTPUT" tail="on"/>
+      <arc head="off_1" kind="INPUT" tail="active_1"/>
+      <arc head="idle_1" kind="OUTPUT" mult-k="1.4737304687500004" tail="off_1">
         <point x="33.0" y="4.0"/>
       </arc>
-      <arc head="off_command" kind="OUTPUT" tail="off"/>
-      <arc head="on_command" kind="OUTPUT" tail="on"/>
-      <arc head="no_event" kind="OUTPUT" tail="able"/>
-      <arc head="copy_able" kind="INPUT" tail="copy_sensing"/>
-      <arc head="copy_sensing" kind="OUTPUT" tail="copy_switch_on"/>
-      <arc head="copy_switch_off" kind="INPUT" tail="copy_sensing"/>
-      <arc head="copy_switch_off" kind="INPUT" tail="copy_off_command"/>
-      <arc head="copy_switch_on" kind="INPUT" tail="copy_on_command"/>
-      <arc head="copy_flushing" kind="INHIBITOR" tail="copy_sensing"/>
-      <arc head="copy_sensing" kind="OUTPUT" tail="copy_able"/>
-      <arc head="copy_unable" kind="INPUT" tail="copy_sensing"/>
-      <arc head="copy_sensing" kind="OUTPUT" tail="copy_unable"/>
-      <arc head="copy_used" kind="OUTPUT" tail="copy_unable"/>
-      <arc head="copy_unable" kind="INHIBITOR" tail="copy_used"/>
-      <arc head="copy_able" kind="INHIBITOR" tail="copy_used"/>
-      <arc head="copy_flushing" kind="INPUT" tail="copy_used"/>
-      <arc head="copy_on" kind="INPUT" mult-k="1.1291992187500002" tail="copy_Idle">
+      <arc head="off_command_1" kind="OUTPUT" tail="off_1"/>
+      <arc head="on_command_1" kind="OUTPUT" tail="on"/>
+      <arc head="no_event" kind="OUTPUT" tail="able_1"/>
+      <arc head="able_2" kind="INPUT" tail="sensing_2"/>
+      <arc head="sensing_2" kind="OUTPUT" tail="switch_on_2"/>
+      <arc head="switch_off_2" kind="INPUT" tail="sensing_2"/>
+      <arc head="switch_off_2" kind="INPUT" tail="off_command_2"/>
+      <arc head="switch_on_2" kind="INPUT" tail="on_command_2"/>
+      <arc head="flushing_2" kind="INHIBITOR" tail="sensing_2"/>
+      <arc head="sensing_2" kind="OUTPUT" tail="able_2"/>
+      <arc head="unable_2" kind="INPUT" tail="sensing_2"/>
+      <arc head="sensing_2" kind="OUTPUT" tail="unable_2"/>
+      <arc head="used_2" kind="OUTPUT" tail="unable_2"/>
+      <arc head="unable_2" kind="INHIBITOR" tail="used_2"/>
+      <arc head="able_2" kind="INHIBITOR" tail="used_2"/>
+      <arc head="flushing_2" kind="INPUT" tail="used_2"/>
+      <arc head="on_2" kind="INPUT" mult-k="1.1291992187500002" tail="idle_2">
         <point x="60.85986328125" y="17.068164062500003"/>
       </arc>
-      <arc head="copy_Active" kind="OUTPUT" tail="copy_on"/>
-      <arc head="copy_off" kind="INPUT" tail="copy_Active"/>
-      <arc head="copy_Idle" kind="OUTPUT" mult-k="1.4737304687500004" tail="copy_off">
+      <arc head="active_2" kind="OUTPUT" tail="on_2"/>
+      <arc head="off_2" kind="INPUT" tail="active_2"/>
+      <arc head="idle_2" kind="OUTPUT" mult-k="1.4737304687500004" tail="off_2">
         <point x="61.0" y="7.0"/>
       </arc>
-      <arc head="copy_off_command" kind="OUTPUT" tail="copy_off"/>
-      <arc head="copy_on_command" kind="OUTPUT" tail="copy_on"/>
-      <arc head="no_event" kind="OUTPUT" mult-k="0.4262695312500001" tail="copy_able"/>
-      <arc head="copy_able" kind="INPUT" mult-k="0.6629882812500001" tail="process"/>
-      <arc head="copy_unable" kind="INPUT" mult-k="0.6502929687500001" tail="process"/>
-      <arc head="process" kind="OUTPUT" mult-k="0.34345703125000004" tail="copy_unable"/>
+      <arc head="off_command_2" kind="OUTPUT" tail="off_2"/>
+      <arc head="on_command_2" kind="OUTPUT" tail="on_2"/>
+      <arc head="no_event" kind="OUTPUT" mult-k="0.4262695312500001" tail="able_2"/>
+      <arc head="able_2" kind="INPUT" mult-k="0.6629882812500001" tail="hazard"/>
+      <arc head="unable_2" kind="INPUT" mult-k="0.6502929687500001" tail="hazard"/>
+      <arc head="hazard" kind="OUTPUT" mult-k="0.34345703125000004" tail="unable_2"/>
+    </edges>
+  </gspn>
+  <gspn name="two_interleaved" show-color-cmd="false" show-fluid-cmd="false" zoom="125">
+    <nodes>
+      <place label-x="-2.5" label-y="-1.5" marking="1" name="no_event" superpos-y="1.5" x="14.0" y="25.0"/>
+      <transition delay="EventStartRate" delay-x="-1.5" delay-y="1.5" name="activation" nservers-x="0.5" type="EXP" x="18.55" y="25.0"/>
+      <transition delay="EventEndRate" delay-x="-2.0" delay-y="1.5" name="deactivation" nservers-x="0.5" type="EXP" x="35.55" y="25.0"/>
+      <template last-binding="0.05" name="EventStartRate" type="REAL" x="2.0" y="6.0"/>
+      <template last-binding="0.001" name="EventEndRate" type="REAL" x="2.0" y="4.0"/>
+      <place label-x="-2.0" label-y="-1.5" name="sensing_1" x="13.0" y="10.0"/>
+      <transition label-x="-1.5" label-y="0.0" name="able_1" rotation="-0.0" type="IMM" weight="DetectionProb_1" weight-x="2.5" weight-y="-2.0" x="7.85" y="17.0"/>
+      <transition label-y="1.5" name="switch_on_1" superpos-x="1.0" superpos-y="0.5" type="IMM" x="17.85" y="10.0"/>
+      <transition label-x="-2.0" name="switch_off_1" superpos-x="1.0" superpos-y="0.5" type="IMM" x="17.85" y="6.0"/>
+      <place label-y="-1.5" name="on_command" superpos-y="1.5" superposition-tags="on" x="22.0" y="10.0"/>
+      <place label-y="-1.5" name="off_command" superpos-y="1.5" superposition-tags="off" x="22.0" y="6.0"/>
+      <transition label-y="-1.0" name="flushing_1" rotation="1.5707963267948966" superpos-x="2.0" superpos-y="0.5" type="IMM" x="13.85" y="14.0"/>
+      <template last-binding="0.6" name="DetectionProb_1" type="REAL" x="2.0" y="25.0"/>
+      <transition label-x="2.0" label-y="0.0" name="unable_1" rotation="-0.0" type="IMM" weight="UnDetectionProb_1" weight-x="5.0" weight-y="-2.0" x="19.85" y="17.0"/>
+      <place label-x="2.5" label-y="-1.0" name="hazard" superpos-y="1.5" superposition-tags="request" x="26.0" y="25.0"/>
+      <place name="used_1" x="13.0" y="17.0"/>
+      <place label-x="2.5" label-y="0.0" marking="1" name="idle" x="32.0" y="8.0"/>
+      <place label-x="-2.5" label-y="0.0" name="active_1" x="27.0" y="8.0"/>
+      <transition delay="InRate" delay-x="0.0" delay-y="1.5" label-x="-1.0" label-y="-1.0" name="on" nservers-x="0.5" rotation="1.5707963267948966" type="EXP" x="27.55" y="13.0"/>
+      <transition delay="OffRate" delay-x="1.0" name="off_1" nservers-x="0.5" rotation="1.5707963267948966" type="EXP" x="27.55" y="3.0"/>
+      <template last-binding="0.1" name="InRate" type="REAL" x="2.0" y="8.0"/>
+      <template last-binding="1" name="OffRate" type="REAL" x="2.0" y="10.0"/>
+      <place label-x="-2.0" label-y="-1.5" name="sensing_2" x="40.0" y="10.0"/>
+      <transition label-x="-2.0" label-y="-0.5" name="able_2" rotation="-0.0" type="IMM" weight="DetectionProb_2" weight-x="2.5" weight-y="-2.0" x="34.85" y="20.0"/>
+      <transition label-y="1.5" name="switch_on_2" superpos-x="1.0" superpos-y="0.5" type="IMM" x="44.85" y="10.0"/>
+      <transition label-x="-2.0" name="switch_off_2" superpos-x="1.0" superpos-y="0.5" type="IMM" x="41.85" y="6.0"/>
+      <place label-y="-1.5" name="on_command_2" superpos-y="1.5" superposition-tags="on" x="49.0" y="10.0"/>
+      <place label-y="-1.5" name="off_command_2" superpos-y="1.5" superposition-tags="off" x="47.0" y="6.0"/>
+      <transition label-y="-1.0" name="flushing_2" rotation="1.5707963267948966" superpos-x="2.0" superpos-y="0.5" type="IMM" x="40.85" y="17.0"/>
+      <template name="DetectionProb_2" type="REAL" x="42.0" y="25.0"/>
+      <transition label-x="2.0" label-y="0.0" name="unable_2" rotation="-0.0" type="IMM" weight="UnDetectionProb_2" weight-x="8.5" weight-y="-2.0" x="46.85" y="20.0"/>
+      <place name="used_2" x="40.0" y="20.0"/>
+      <place label-x="-2.5" label-y="0.0" name="active_2" x="55.0" y="11.0"/>
+      <transition delay="InRate_2" delay-x="0.0" delay-y="1.5" label-x="-1.0" label-y="-1.0" name="on_2" nservers-x="0.5" rotation="1.5707963267948966" type="EXP" x="55.55" y="16.0"/>
+      <transition delay="OffRate_2" delay-x="1.0" name="off_2" nservers-x="0.5" rotation="1.5707963267948966" type="EXP" x="55.55" y="6.0"/>
+      <template last-binding="0.0" name="InRate_2" type="REAL" x="51.0" y="25.0"/>
+      <template last-binding="0.0" name="OffRate_2" type="REAL" x="51.0" y="28.0"/>
+      <template last-binding="0.6" name="UnDetectionProb_1" type="REAL" x="2.0" y="28.0"/>
+      <template name="UnDetectionProb_2" type="REAL" x="41.0" y="28.0"/>
+    </nodes>
+    <edges>
+      <arc head="activation" kind="INPUT" tail="no_event"/>
+      <arc head="hazard" kind="OUTPUT" tail="activation"/>
+      <arc head="deactivation" kind="INPUT" tail="hazard"/>
+      <arc head="no_event" kind="OUTPUT" mult-k="0.50009765625" mult-x="0.6478902170605423" mult-y="1.4591560868242173" tail="deactivation">
+        <point x="38.5" y="26.0"/>
+        <point x="38.5" y="29.0"/>
+        <point x="12.5" y="29.0"/>
+        <point x="12.50449259402326" y="27.637405493841477"/>
+        <point x="12.5" y="26.0"/>
+      </arc>
+      <arc head="able_1" kind="INPUT" tail="sensing_1"/>
+      <arc head="sensing_1" kind="OUTPUT" tail="switch_on_1"/>
+      <arc head="switch_off_1" kind="INPUT" tail="sensing_1"/>
+      <arc head="switch_off_1" kind="INPUT" tail="off_command"/>
+      <arc head="switch_on_1" kind="INPUT" tail="on_command"/>
+      <arc head="flushing_1" kind="INHIBITOR" tail="sensing_1"/>
+      <arc head="sensing_1" kind="OUTPUT" tail="able_1"/>
+      <arc head="unable_1" kind="INPUT" tail="sensing_1"/>
+      <arc head="sensing_1" kind="OUTPUT" tail="unable_1"/>
+      <arc head="unable_1" kind="INPUT" tail="hazard"/>
+      <arc head="hazard" kind="OUTPUT" tail="unable_1"/>
+      <arc head="used_1" kind="OUTPUT" tail="unable_1"/>
+      <arc head="unable_1" kind="INHIBITOR" tail="used_1"/>
+      <arc head="able_1" kind="INHIBITOR" tail="used_1"/>
+      <arc head="flushing_1" kind="INPUT" tail="used_1"/>
+      <arc head="able_1" kind="INPUT" tail="hazard"/>
+      <arc head="on" kind="INPUT" mult-k="1.1291992187500002" tail="idle">
+        <point x="32.85986328125" y="14.068164062500003"/>
+      </arc>
+      <arc head="active_1" kind="OUTPUT" tail="on"/>
+      <arc head="off_1" kind="INPUT" tail="active_1"/>
+      <arc head="idle" kind="OUTPUT" mult-k="1.4737304687500004" tail="off_1">
+        <point x="33.0" y="4.0"/>
+      </arc>
+      <arc head="off_command" kind="OUTPUT" tail="off_1"/>
+      <arc head="on_command" kind="OUTPUT" tail="on"/>
+      <arc head="no_event" kind="OUTPUT" tail="able_1"/>
+      <arc head="able_2" kind="INPUT" tail="sensing_2"/>
+      <arc head="sensing_2" kind="OUTPUT" tail="switch_on_2"/>
+      <arc head="switch_off_2" kind="INPUT" tail="sensing_2"/>
+      <arc head="switch_off_2" kind="INPUT" tail="off_command_2"/>
+      <arc head="switch_on_2" kind="INPUT" tail="on_command_2"/>
+      <arc head="flushing_2" kind="INHIBITOR" tail="sensing_2"/>
+      <arc head="sensing_2" kind="OUTPUT" tail="able_2"/>
+      <arc head="unable_2" kind="INPUT" tail="sensing_2"/>
+      <arc head="sensing_2" kind="OUTPUT" tail="unable_2"/>
+      <arc head="used_2" kind="OUTPUT" tail="unable_2"/>
+      <arc head="unable_2" kind="INHIBITOR" tail="used_2"/>
+      <arc head="able_2" kind="INHIBITOR" tail="used_2"/>
+      <arc head="flushing_2" kind="INPUT" tail="used_2"/>
+      <arc head="active_2" kind="OUTPUT" tail="on_2"/>
+      <arc head="off_2" kind="INPUT" tail="active_2"/>
+      <arc head="off_command_2" kind="OUTPUT" tail="off_2"/>
+      <arc head="on_command_2" kind="OUTPUT" tail="on_2"/>
+      <arc head="no_event" kind="OUTPUT" mult-k="0.4262695312500001" tail="able_2"/>
+      <arc head="able_2" kind="INPUT" mult-k="0.6629882812500001" tail="hazard"/>
+      <arc head="unable_2" kind="INPUT" mult-k="0.6502929687500001" tail="hazard"/>
+      <arc head="hazard" kind="OUTPUT" mult-k="0.34345703125000004" tail="unable_2"/>
+      <arc head="idle" kind="OUTPUT" tail="off_2">
+        <point x="56.0" y="4.0"/>
+        <point x="35.0" y="4.0"/>
+      </arc>
+      <arc head="on_2" kind="INPUT" tail="idle">
+        <point x="35.0" y="16.5"/>
+      </arc>
+    </edges>
+  </gspn>
+  <gspn name="two_most_probable" show-color-cmd="false" show-fluid-cmd="false" zoom="125">
+    <nodes>
+      <place label-x="-2.5" label-y="-1.5" marking="1" name="no_event" superpos-y="1.5" x="16.0" y="35.0"/>
+      <transition delay="EventStartRate" delay-x="-1.5" delay-y="1.5" name="activation" nservers-x="0.5" type="EXP" x="20.55" y="35.0"/>
+      <transition delay="EventEndRate" delay-x="-2.0" delay-y="1.5" name="deactivation" nservers-x="0.5" type="EXP" x="37.55" y="35.0"/>
+      <template last-binding="0.05" name="EventStartRate" type="REAL" x="4.0" y="16.0"/>
+      <template last-binding="0.001" name="EventEndRate" type="REAL" x="4.0" y="14.0"/>
+      <place label-x="-2.0" label-y="-1.5" name="sensing_1" x="15.0" y="20.0"/>
+      <transition label-x="-1.5" label-y="0.0" name="able_1" rotation="-0.0" type="IMM" weight="DetectionProb_1" weight-x="2.5" weight-y="-2.0" x="9.85" y="27.0"/>
+      <transition label-y="1.5" name="switch_on_1" superpos-x="1.0" superpos-y="0.5" type="IMM" x="19.85" y="20.0"/>
+      <transition label-x="-2.0" name="switch_off_1" superpos-x="1.0" superpos-y="0.5" type="IMM" x="19.85" y="16.0"/>
+      <place label-y="-1.5" name="on_command" superpos-y="1.5" superposition-tags="on" x="24.0" y="20.0"/>
+      <place label-y="-1.5" name="off_command" superpos-y="1.5" superposition-tags="off" x="24.0" y="16.0"/>
+      <transition label-y="-1.0" name="flushing_1" rotation="1.5707963267948966" superpos-x="2.0" superpos-y="0.5" type="IMM" x="15.85" y="24.0"/>
+      <template last-binding="0.6" name="DetectionProb_1" type="REAL" x="4.0" y="35.0"/>
+      <transition label-x="2.0" label-y="0.0" name="unable_1" rotation="-0.0" type="IMM" weight="UnDetectionProb_1" weight-x="5.0" weight-y="-2.0" x="21.85" y="27.0"/>
+      <place label-x="2.5" label-y="-1.0" name="hazard" superpos-y="1.5" superposition-tags="request" x="28.0" y="35.0"/>
+      <place name="used_1" x="15.0" y="27.0"/>
+      <place label-x="2.5" label-y="0.0" name="idle_1" x="34.0" y="18.0"/>
+      <place label-x="-2.5" label-y="0.0" name="active_1" x="29.0" y="18.0"/>
+      <transition delay="InRate" delay-x="0.0" delay-y="1.5" label-x="-1.0" label-y="-1.0" name="on" nservers-x="0.5" rotation="1.5707963267948966" type="EXP" x="29.55" y="23.0"/>
+      <transition delay="OffRate" delay-x="1.0" name="off_1" nservers-x="0.5" rotation="1.5707963267948966" type="EXP" x="29.55" y="13.0"/>
+      <template last-binding="0.1" name="InRate" type="REAL" x="4.0" y="18.0"/>
+      <template last-binding="1" name="OffRate" type="REAL" x="4.0" y="20.0"/>
+      <place label-x="-2.0" label-y="-1.5" name="sensing_2" x="42.0" y="23.0"/>
+      <transition label-x="-2.0" label-y="-0.5" name="able_2" rotation="-0.0" type="IMM" weight="DetectionProb_2" weight-x="2.5" weight-y="-2.0" x="36.85" y="30.0"/>
+      <transition label-y="1.5" name="switch_on_2" superpos-x="1.0" superpos-y="0.5" type="IMM" x="46.85" y="23.0"/>
+      <transition label-x="-2.0" name="switch_off_2" superpos-x="1.0" superpos-y="0.5" type="IMM" x="44.85" y="19.0"/>
+      <place label-y="-1.5" name="on_command_2" superpos-y="1.5" superposition-tags="on" x="51.0" y="23.0"/>
+      <place label-y="-1.5" name="off_command_2" superpos-y="1.5" superposition-tags="off" x="51.0" y="19.0"/>
+      <transition label-y="-1.0" name="flushing_2" rotation="1.5707963267948966" superpos-x="2.0" superpos-y="0.5" type="IMM" x="42.85" y="27.0"/>
+      <template name="DetectionProb_2" type="REAL" x="44.0" y="35.0"/>
+      <transition label-x="2.0" label-y="0.0" name="unable_2" rotation="-0.0" type="IMM" weight="UnDetectionProb_2" weight-x="8.5" weight-y="-2.0" x="48.85" y="30.0"/>
+      <place name="used_2" x="42.0" y="30.0"/>
+      <place label-x="2.5" label-y="0.0" name="idle_2" x="62.0" y="21.0"/>
+      <place label-x="-2.5" label-y="0.0" name="active_2" x="57.0" y="21.0"/>
+      <transition delay="InRate_2" delay-x="0.0" delay-y="1.5" label-x="-1.0" label-y="-1.0" name="on_2" nservers-x="0.5" rotation="1.5707963267948966" type="EXP" x="57.55" y="26.0"/>
+      <transition delay="OffRate_2" delay-x="1.0" name="off_2" nservers-x="0.5" rotation="1.5707963267948966" type="EXP" x="57.55" y="17.0"/>
+      <template last-binding="0.0" name="InRate_2" type="REAL" x="53.0" y="35.0"/>
+      <template last-binding="0.0" name="OffRate_2" type="REAL" x="53.0" y="38.0"/>
+      <template last-binding="0.6" name="UnDetectionProb_1" type="REAL" x="4.0" y="38.0"/>
+      <template name="UnDetectionProb_2" type="REAL" x="43.0" y="38.0"/>
+      <place marking="1" name="idle" x="44.0" y="13.0"/>
+      <transition name="scheduling_1" rotation="1.5707963267948966" type="IMM" weight="DetectionProb_1" weight-x="8.0" x="38.85" y="15.0"/>
+      <transition name="scheduling_2" type="IMM" weight="DetectionProb_2" weight-x="8.5" x="51.85" y="13.0"/>
+    </nodes>
+    <edges>
+      <arc head="activation" kind="INPUT" tail="no_event"/>
+      <arc head="hazard" kind="OUTPUT" tail="activation"/>
+      <arc head="deactivation" kind="INPUT" tail="hazard"/>
+      <arc head="no_event" kind="OUTPUT" mult-k="0.50009765625" mult-x="0.6478902170605423" mult-y="1.4591560868242173" tail="deactivation">
+        <point x="40.5" y="36.0"/>
+        <point x="40.5" y="39.0"/>
+        <point x="14.5" y="39.0"/>
+        <point x="14.50449259402326" y="37.63740549384148"/>
+        <point x="14.5" y="36.0"/>
+      </arc>
+      <arc head="able_1" kind="INPUT" tail="sensing_1"/>
+      <arc head="sensing_1" kind="OUTPUT" tail="switch_on_1"/>
+      <arc head="switch_off_1" kind="INPUT" tail="sensing_1"/>
+      <arc head="switch_off_1" kind="INPUT" tail="off_command"/>
+      <arc head="switch_on_1" kind="INPUT" tail="on_command"/>
+      <arc head="flushing_1" kind="INHIBITOR" tail="sensing_1"/>
+      <arc head="sensing_1" kind="OUTPUT" tail="able_1"/>
+      <arc head="unable_1" kind="INPUT" tail="sensing_1"/>
+      <arc head="sensing_1" kind="OUTPUT" tail="unable_1"/>
+      <arc head="unable_1" kind="INPUT" tail="hazard"/>
+      <arc head="hazard" kind="OUTPUT" tail="unable_1"/>
+      <arc head="used_1" kind="OUTPUT" tail="unable_1"/>
+      <arc head="unable_1" kind="INHIBITOR" tail="used_1"/>
+      <arc head="able_1" kind="INHIBITOR" tail="used_1"/>
+      <arc head="flushing_1" kind="INPUT" tail="used_1"/>
+      <arc head="able_1" kind="INPUT" tail="hazard"/>
+      <arc head="on" kind="INPUT" mult-k="1.1291992187500002" tail="idle_1">
+        <point x="34.85986328125" y="24.068164062500003"/>
+      </arc>
+      <arc head="active_1" kind="OUTPUT" tail="on"/>
+      <arc head="off_1" kind="INPUT" tail="active_1"/>
+      <arc head="off_command" kind="OUTPUT" tail="off_1"/>
+      <arc head="on_command" kind="OUTPUT" tail="on"/>
+      <arc head="no_event" kind="OUTPUT" tail="able_1"/>
+      <arc head="able_2" kind="INPUT" tail="sensing_2"/>
+      <arc head="sensing_2" kind="OUTPUT" tail="switch_on_2"/>
+      <arc head="switch_off_2" kind="INPUT" tail="sensing_2"/>
+      <arc head="switch_off_2" kind="INPUT" tail="off_command_2"/>
+      <arc head="switch_on_2" kind="INPUT" tail="on_command_2"/>
+      <arc head="flushing_2" kind="INHIBITOR" tail="sensing_2"/>
+      <arc head="sensing_2" kind="OUTPUT" tail="able_2"/>
+      <arc head="unable_2" kind="INPUT" tail="sensing_2"/>
+      <arc head="sensing_2" kind="OUTPUT" tail="unable_2"/>
+      <arc head="used_2" kind="OUTPUT" tail="unable_2"/>
+      <arc head="unable_2" kind="INHIBITOR" tail="used_2"/>
+      <arc head="able_2" kind="INHIBITOR" tail="used_2"/>
+      <arc head="flushing_2" kind="INPUT" tail="used_2"/>
+      <arc head="on_2" kind="INPUT" mult-k="1.1291992187500002" tail="idle_2">
+        <point x="62.85986328125" y="27.068164062500003"/>
+      </arc>
+      <arc head="active_2" kind="OUTPUT" tail="on_2"/>
+      <arc head="off_2" kind="INPUT" tail="active_2"/>
+      <arc head="off_command_2" kind="OUTPUT" tail="off_2"/>
+      <arc head="on_command_2" kind="OUTPUT" tail="on_2"/>
+      <arc head="no_event" kind="OUTPUT" mult-k="0.4262695312500001" tail="able_2"/>
+      <arc head="able_2" kind="INPUT" mult-k="0.6629882812500001" tail="hazard"/>
+      <arc head="unable_2" kind="INPUT" mult-k="0.6502929687500001" tail="hazard"/>
+      <arc head="hazard" kind="OUTPUT" mult-k="0.34345703125000004" tail="unable_2"/>
+      <arc head="idle" kind="OUTPUT" tail="off_1"/>
+      <arc head="idle" kind="OUTPUT" tail="off_2"/>
+      <arc head="scheduling_2" kind="INPUT" tail="idle"/>
+      <arc head="idle_2" kind="OUTPUT" mult-k="0.92275390625" tail="scheduling_2">
+        <point x="63.0" y="14.0"/>
+      </arc>
+      <arc head="scheduling_1" kind="INPUT" tail="idle"/>
+      <arc head="idle_1" kind="OUTPUT" tail="scheduling_1"/>
     </edges>
   </gspn>
   <gspn name="three_sensors" show-color-cmd="false" show-fluid-cmd="false">
@@ -268,54 +494,54 @@
       <transition delay="EventEndRate" delay-x="-2.0" delay-y="1.5" name="deactivation" nservers-x="0.5" type="EXP" x="35.55" y="25.0"/>
       <template last-binding="0.05" name="EventStartRate" type="REAL" x="2.0" y="6.0"/>
       <template last-binding="0.001" name="EventEndRate" type="REAL" x="2.0" y="4.0"/>
-      <place label-x="-2.0" label-y="-1.5" name="sensing" x="13.0" y="10.0"/>
-      <transition label-x="-1.5" label-y="0.0" name="able" rotation="-0.0" type="IMM" weight="DetectionProb_1" weight-x="2.5" weight-y="-2.0" x="7.85" y="17.0"/>
-      <transition label-y="1.5" name="switch_on" superpos-x="1.0" superpos-y="0.5" type="IMM" x="17.85" y="10.0"/>
-      <transition label-x="-2.0" name="switch_off" superpos-x="1.0" superpos-y="0.5" type="IMM" x="17.85" y="6.0"/>
-      <place label-y="-1.5" name="on_command" superpos-y="1.5" superposition-tags="on" x="20.0" y="10.0"/>
-      <place label-y="-1.5" name="off_command" superpos-y="1.5" superposition-tags="off" x="20.0" y="6.0"/>
-      <transition label-y="-1.0" name="flushing" rotation="1.5707963267948966" superpos-x="2.0" superpos-y="0.5" type="IMM" x="13.85" y="14.0"/>
+      <place label-x="-2.0" label-y="-1.5" name="sensing_1" x="13.0" y="10.0"/>
+      <transition label-x="-1.5" label-y="0.0" name="able_1" rotation="-0.0" type="IMM" weight="DetectionProb_1" weight-x="2.5" weight-y="-2.0" x="7.85" y="17.0"/>
+      <transition label-y="1.5" name="switch_on_1" superpos-x="1.0" superpos-y="0.5" type="IMM" x="17.85" y="10.0"/>
+      <transition label-x="-2.0" name="switch_off_1" superpos-x="1.0" superpos-y="0.5" type="IMM" x="17.85" y="6.0"/>
+      <place label-y="-1.5" name="on_command_1" superpos-y="1.5" superposition-tags="on" x="23.0" y="10.0"/>
+      <place label-y="-1.5" name="off_command_1" superpos-y="1.5" superposition-tags="off" x="23.0" y="6.0"/>
+      <transition label-y="-1.0" name="flushing_1" rotation="1.5707963267948966" superpos-x="2.0" superpos-y="0.5" type="IMM" x="13.85" y="14.0"/>
       <template last-binding="0.6" name="DetectionProb_1" type="REAL" x="2.0" y="2.0"/>
-      <transition label-x="2.0" label-y="0.0" name="unable" rotation="-0.0" type="IMM" weight="UnDetectionProb_1" weight-x="8.5" weight-y="-2.0" x="19.85" y="17.0"/>
-      <place label-x="2.5" label-y="-1.0" name="process" superpos-y="1.5" superposition-tags="request" x="26.0" y="25.0"/>
-      <place name="used" x="13.0" y="17.0"/>
-      <place label-x="2.5" label-y="0.0" marking="1" name="Idle" x="41.0" y="10.0"/>
-      <place label-x="-2.5" label-y="0.0" name="Active" x="36.0" y="10.0"/>
-      <transition delay="InRate" delay-x="0.0" delay-y="1.5" label-x="-1.0" label-y="-1.0" name="on" nservers-x="0.5" rotation="1.5707963267948966" type="EXP" x="36.55" y="15.0"/>
-      <transition delay="OffRate" delay-x="1.0" name="off" nservers-x="0.5" rotation="1.5707963267948966" type="EXP" x="36.55" y="5.0"/>
+      <transition label-x="2.0" label-y="0.0" name="unable_1" rotation="-0.0" type="IMM" weight="UnDetectionProb_1" weight-x="8.5" weight-y="-2.0" x="19.85" y="17.0"/>
+      <place label-x="2.5" label-y="-1.0" name="hazard" superpos-y="1.5" superposition-tags="request" x="26.0" y="25.0"/>
+      <place name="used_1" x="13.0" y="17.0"/>
+      <place label-x="2.5" label-y="0.0" marking="1" name="idle_1" x="34.0" y="9.0"/>
+      <place label-x="-2.5" label-y="0.0" name="active_1" x="29.0" y="9.0"/>
+      <transition delay="InRate" delay-x="0.0" delay-y="1.5" label-x="-1.0" label-y="-1.0" name="on_1" nservers-x="0.5" rotation="1.5707963267948966" type="EXP" x="29.55" y="14.0"/>
+      <transition delay="OffRate" delay-x="1.0" name="off_1" nservers-x="0.5" rotation="1.5707963267948966" type="EXP" x="29.55" y="4.0"/>
       <template last-binding="0.1" name="InRate" type="REAL" x="2.0" y="8.0"/>
       <template last-binding="1" name="OffRate" type="REAL" x="2.0" y="10.0"/>
-      <place label-x="-2.0" label-y="-1.5" name="copy_sensing" x="59.0" y="7.0"/>
-      <transition label-x="-1.5" label-y="0.0" name="copy_able" rotation="-0.0" type="IMM" weight="DetectionProb_2" weight-x="2.5" weight-y="-2.0" x="53.85" y="14.0"/>
-      <transition label-y="1.5" name="copy_switch_on" superpos-x="1.0" superpos-y="0.5" type="IMM" x="63.85" y="7.0"/>
-      <transition label-x="-2.0" name="copy_switch_off" superpos-x="1.0" superpos-y="0.5" type="IMM" x="63.85" y="3.0"/>
-      <place label-y="-1.5" name="copy_on_command" superpos-y="1.5" superposition-tags="on" x="66.0" y="7.0"/>
-      <place label-y="-1.5" name="copy_off_command" superpos-y="1.5" superposition-tags="off" x="66.0" y="3.0"/>
-      <transition label-y="-1.0" name="copy_flushing" rotation="1.5707963267948966" superpos-x="2.0" superpos-y="0.5" type="IMM" x="59.85" y="11.0"/>
+      <place label-x="-2.0" label-y="-1.5" name="sensing_2" x="45.0" y="8.0"/>
+      <transition label-x="-1.5" label-y="0.0" name="able_2" rotation="-0.0" type="IMM" weight="DetectionProb_2" weight-x="2.5" weight-y="-2.0" x="39.85" y="15.0"/>
+      <transition label-y="1.5" name="switch_on_2" superpos-x="1.0" superpos-y="0.5" type="IMM" x="49.85" y="8.0"/>
+      <transition label-x="-2.0" name="switch_off_2" superpos-x="1.0" superpos-y="0.5" type="IMM" x="49.85" y="4.0"/>
+      <place label-y="-1.5" name="on_command_2" superpos-y="1.5" superposition-tags="on" x="55.0" y="8.0"/>
+      <place label-y="-1.5" name="off_command_2" superpos-y="1.5" superposition-tags="off" x="55.0" y="4.0"/>
+      <transition label-y="-1.0" name="flushing_2" rotation="1.5707963267948966" superpos-x="2.0" superpos-y="0.5" type="IMM" x="45.85" y="12.0"/>
       <template name="DetectionProb_2" type="REAL" x="11.0" y="2.0"/>
-      <transition label-x="2.0" label-y="0.0" name="copy_unable" rotation="-0.0" type="IMM" weight="UnDetectionProb_2" weight-x="8.5" weight-y="-2.0" x="65.85" y="14.0"/>
-      <place name="copy_used" x="59.0" y="14.0"/>
-      <place label-x="2.5" label-y="0.0" marking="1" name="copy_Idle" x="87.0" y="8.0"/>
-      <place label-x="-2.5" label-y="0.0" name="copy_Active" x="82.0" y="8.0"/>
-      <transition delay="InRate_2" delay-x="0.0" delay-y="1.5" label-x="-1.0" label-y="-1.0" name="copy_on" nservers-x="0.5" rotation="1.5707963267948966" type="EXP" x="82.55" y="13.0"/>
-      <transition delay="OffRate_2" delay-x="1.0" name="copy_off" nservers-x="0.5" rotation="1.5707963267948966" type="EXP" x="82.55" y="3.0"/>
-      <template last-binding="0.0" name="InRate_2" type="REAL" x="89.0" y="3.0"/>
-      <template last-binding="0.0" name="OffRate_2" type="REAL" x="89.0" y="1.0"/>
-      <place label-x="-2.0" label-y="-1.5" name="copy_copy_sensing" x="61.0" y="24.0"/>
-      <transition label-x="-1.5" label-y="0.0" name="copy_copy_able" rotation="-0.0" type="IMM" weight="DetectionProb_3" weight-x="2.5" weight-y="-2.0" x="55.85" y="31.0"/>
-      <transition label-y="1.5" name="copy_copy_switch_on" superpos-x="1.0" superpos-y="0.5" type="IMM" x="65.85" y="24.0"/>
-      <transition label-x="-2.0" name="copy_copy_switch_off" superpos-x="1.0" superpos-y="0.5" type="IMM" x="65.85" y="20.0"/>
-      <place label-y="-1.5" name="copy_copy_on_command" superpos-y="1.5" superposition-tags="on" x="68.0" y="24.0"/>
-      <place label-y="-1.5" name="copy_copy_off_command" superpos-y="1.5" superposition-tags="off" x="68.0" y="20.0"/>
-      <transition label-y="-1.0" name="copy_copy_flushing" rotation="1.5707963267948966" superpos-x="2.0" superpos-y="0.5" type="IMM" x="61.85" y="28.0"/>
-      <transition label-x="2.0" label-y="0.0" name="copy_copy_unable" rotation="-0.0" type="IMM" weight="UnDetectionProb_3" weight-x="8.5" weight-y="-2.0" x="67.85" y="31.0"/>
-      <place name="copy_copy_used" x="61.0" y="31.0"/>
-      <place label-x="2.5" label-y="0.0" marking="1" name="copy_copy_Idle" x="89.0" y="25.0"/>
-      <place label-x="-2.5" label-y="0.0" name="copy_copy_Active" x="84.0" y="25.0"/>
-      <transition delay="InRate_3" delay-x="0.0" delay-y="1.5" label-x="-1.0" label-y="-1.0" name="copy_copy_on" nservers-x="0.5" rotation="1.5707963267948966" type="EXP" x="84.55" y="30.0"/>
-      <transition delay="OffRate_3" delay-x="1.0" name="copy_copy_off" nservers-x="0.5" rotation="1.5707963267948966" type="EXP" x="84.55" y="20.0"/>
-      <template last-binding="0.0" name="InRate_3" type="REAL" x="77.0" y="36.0"/>
-      <template last-binding="0.0" name="OffRate_3" type="REAL" x="68.0" y="36.0"/>
+      <transition label-x="2.0" label-y="0.0" name="unable_2" rotation="-0.0" type="IMM" weight="UnDetectionProb_2" weight-x="8.5" weight-y="-2.0" x="51.85" y="15.0"/>
+      <place name="used_2" x="45.0" y="15.0"/>
+      <place label-x="2.5" label-y="0.0" marking="1" name="idle_2" x="73.0" y="9.0"/>
+      <place label-x="-2.5" label-y="0.0" name="active_2" x="68.0" y="9.0"/>
+      <transition delay="InRate_2" delay-x="0.0" delay-y="1.5" label-x="-1.0" label-y="-1.0" name="on_2" nservers-x="0.5" rotation="1.5707963267948966" type="EXP" x="68.55" y="14.0"/>
+      <transition delay="OffRate_2" delay-x="1.0" name="off_2" nservers-x="0.5" rotation="1.5707963267948966" type="EXP" x="68.55" y="4.0"/>
+      <template last-binding="0.0" name="InRate_2" type="REAL" x="20.0" y="33.0"/>
+      <template last-binding="0.0" name="OffRate_2" type="REAL" x="20.0" y="31.0"/>
+      <place label-x="-2.0" label-y="-1.5" name="sensing_3" x="51.0" y="23.0"/>
+      <transition label-x="-1.5" label-y="0.0" name="able_3" rotation="-0.0" type="IMM" weight="DetectionProb_3" weight-x="2.5" weight-y="-2.0" x="45.85" y="30.0"/>
+      <transition label-y="1.5" name="switch_on_3" superpos-x="1.0" superpos-y="0.5" type="IMM" x="55.85" y="23.0"/>
+      <transition label-x="-2.0" name="switch_off_3" superpos-x="1.0" superpos-y="0.5" type="IMM" x="55.85" y="19.0"/>
+      <place label-y="-1.5" name="on_command_3" superpos-y="1.5" superposition-tags="on" x="62.0" y="23.0"/>
+      <place label-y="-1.5" name="off_command_3" superpos-y="1.5" superposition-tags="off" x="62.0" y="19.0"/>
+      <transition label-y="-1.0" name="flushing_3" rotation="1.5707963267948966" superpos-x="2.0" superpos-y="0.5" type="IMM" x="51.85" y="27.0"/>
+      <transition label-x="2.0" label-y="0.0" name="unable_3" rotation="-0.0" type="IMM" weight="UnDetectionProb_3" weight-x="8.5" weight-y="-2.0" x="57.85" y="30.0"/>
+      <place name="used_3" x="51.0" y="30.0"/>
+      <place label-x="2.5" label-y="0.0" marking="1" name="idle_3" x="73.0" y="24.0"/>
+      <place label-x="-2.5" label-y="0.0" name="active_3" x="68.0" y="24.0"/>
+      <transition delay="InRate_3" delay-x="0.0" delay-y="1.5" label-x="-1.0" label-y="-1.0" name="on_3" nservers-x="0.5" rotation="1.5707963267948966" type="EXP" x="68.55" y="29.0"/>
+      <transition delay="OffRate_3" delay-x="1.0" name="off_3" nservers-x="0.5" rotation="1.5707963267948966" type="EXP" x="68.55" y="19.0"/>
+      <template last-binding="0.0" name="InRate_3" type="REAL" x="14.0" y="33.0"/>
+      <template last-binding="0.0" name="OffRate_3" type="REAL" x="14.0" y="31.0"/>
       <template name="DetectionProb_3" type="REAL" x="21.0" y="2.0"/>
       <template last-binding="0.6" name="UnDetectionProb_1" type="REAL" x="3.0" y="31.0"/>
       <template name="UnDetectionProb_2" type="REAL" x="3.0" y="33.0"/>
@@ -323,8 +549,8 @@
     </nodes>
     <edges>
       <arc head="activation" kind="INPUT" tail="no_event"/>
-      <arc head="process" kind="OUTPUT" tail="activation"/>
-      <arc head="deactivation" kind="INPUT" tail="process"/>
+      <arc head="hazard" kind="OUTPUT" tail="activation"/>
+      <arc head="deactivation" kind="INPUT" tail="hazard"/>
       <arc head="no_event" kind="OUTPUT" mult-k="0.50009765625" mult-x="0.6478902170605423" mult-y="1.4591560868242173" tail="deactivation">
         <point x="38.5" y="26.0"/>
         <point x="38.5" y="29.0"/>
@@ -332,344 +558,97 @@
         <point x="12.50449259402326" y="27.637405493841477"/>
         <point x="12.5" y="26.0"/>
       </arc>
-      <arc head="able" kind="INPUT" tail="sensing"/>
-      <arc head="sensing" kind="OUTPUT" tail="switch_on"/>
-      <arc head="switch_off" kind="INPUT" tail="sensing"/>
-      <arc head="switch_off" kind="INPUT" tail="off_command"/>
-      <arc head="switch_on" kind="INPUT" tail="on_command"/>
-      <arc head="flushing" kind="INHIBITOR" tail="sensing"/>
-      <arc head="sensing" kind="OUTPUT" tail="able"/>
-      <arc head="unable" kind="INPUT" tail="sensing"/>
-      <arc head="sensing" kind="OUTPUT" tail="unable"/>
-      <arc head="unable" kind="INPUT" tail="process"/>
-      <arc head="process" kind="OUTPUT" tail="unable"/>
-      <arc head="used" kind="OUTPUT" tail="unable"/>
-      <arc head="unable" kind="INHIBITOR" tail="used"/>
-      <arc head="able" kind="INHIBITOR" tail="used"/>
-      <arc head="flushing" kind="INPUT" tail="used"/>
-      <arc head="able" kind="INPUT" tail="process"/>
-      <arc head="on" kind="INPUT" mult-k="1.1291992187500002" tail="Idle">
-        <point x="41.85986328125" y="16.068164062500003"/>
+      <arc head="able_1" kind="INPUT" tail="sensing_1"/>
+      <arc head="sensing_1" kind="OUTPUT" tail="switch_on_1"/>
+      <arc head="switch_off_1" kind="INPUT" tail="sensing_1"/>
+      <arc head="switch_off_1" kind="INPUT" tail="off_command_1"/>
+      <arc head="switch_on_1" kind="INPUT" tail="on_command_1"/>
+      <arc head="flushing_1" kind="INHIBITOR" tail="sensing_1"/>
+      <arc head="sensing_1" kind="OUTPUT" tail="able_1"/>
+      <arc head="unable_1" kind="INPUT" tail="sensing_1"/>
+      <arc head="sensing_1" kind="OUTPUT" tail="unable_1"/>
+      <arc head="unable_1" kind="INPUT" tail="hazard"/>
+      <arc head="hazard" kind="OUTPUT" tail="unable_1"/>
+      <arc head="used_1" kind="OUTPUT" tail="unable_1"/>
+      <arc head="unable_1" kind="INHIBITOR" tail="used_1"/>
+      <arc head="able_1" kind="INHIBITOR" tail="used_1"/>
+      <arc head="flushing_1" kind="INPUT" tail="used_1"/>
+      <arc head="able_1" kind="INPUT" tail="hazard"/>
+      <arc head="on_1" kind="INPUT" mult-k="1.1291992187500002" tail="idle_1">
+        <point x="34.85986328125" y="15.068164062500003"/>
       </arc>
-      <arc head="Active" kind="OUTPUT" tail="on"/>
-      <arc head="off" kind="INPUT" tail="Active"/>
-      <arc head="Idle" kind="OUTPUT" mult-k="1.4737304687500004" tail="off">
-        <point x="42.0" y="6.0"/>
+      <arc head="active_1" kind="OUTPUT" tail="on_1"/>
+      <arc head="off_1" kind="INPUT" tail="active_1"/>
+      <arc head="idle_1" kind="OUTPUT" mult-k="1.4737304687500004" tail="off_1">
+        <point x="35.0" y="5.0"/>
       </arc>
-      <arc head="off_command" kind="OUTPUT" tail="off"/>
-      <arc head="on_command" kind="OUTPUT" tail="on"/>
-      <arc head="no_event" kind="OUTPUT" tail="able"/>
-      <arc head="copy_able" kind="INPUT" tail="copy_sensing"/>
-      <arc head="copy_sensing" kind="OUTPUT" tail="copy_switch_on"/>
-      <arc head="copy_switch_off" kind="INPUT" tail="copy_sensing"/>
-      <arc head="copy_switch_off" kind="INPUT" tail="copy_off_command"/>
-      <arc head="copy_switch_on" kind="INPUT" tail="copy_on_command"/>
-      <arc head="copy_flushing" kind="INHIBITOR" tail="copy_sensing"/>
-      <arc head="copy_sensing" kind="OUTPUT" tail="copy_able"/>
-      <arc head="copy_unable" kind="INPUT" tail="copy_sensing"/>
-      <arc head="copy_sensing" kind="OUTPUT" tail="copy_unable"/>
-      <arc head="copy_used" kind="OUTPUT" tail="copy_unable"/>
-      <arc head="copy_unable" kind="INHIBITOR" tail="copy_used"/>
-      <arc head="copy_able" kind="INHIBITOR" tail="copy_used"/>
-      <arc head="copy_flushing" kind="INPUT" tail="copy_used"/>
-      <arc head="copy_on" kind="INPUT" mult-k="1.1291992187500002" tail="copy_Idle">
-        <point x="87.85986328125" y="14.068164062500003"/>
+      <arc head="off_command_1" kind="OUTPUT" tail="off_1"/>
+      <arc head="on_command_1" kind="OUTPUT" tail="on_1"/>
+      <arc head="no_event" kind="OUTPUT" tail="able_1"/>
+      <arc head="able_2" kind="INPUT" tail="sensing_2"/>
+      <arc head="sensing_2" kind="OUTPUT" tail="switch_on_2"/>
+      <arc head="switch_off_2" kind="INPUT" tail="sensing_2"/>
+      <arc head="switch_off_2" kind="INPUT" tail="off_command_2"/>
+      <arc head="switch_on_2" kind="INPUT" tail="on_command_2"/>
+      <arc head="flushing_2" kind="INHIBITOR" tail="sensing_2"/>
+      <arc head="sensing_2" kind="OUTPUT" tail="able_2"/>
+      <arc head="unable_2" kind="INPUT" tail="sensing_2"/>
+      <arc head="sensing_2" kind="OUTPUT" tail="unable_2"/>
+      <arc head="used_2" kind="OUTPUT" tail="unable_2"/>
+      <arc head="unable_2" kind="INHIBITOR" tail="used_2"/>
+      <arc head="able_2" kind="INHIBITOR" tail="used_2"/>
+      <arc head="flushing_2" kind="INPUT" tail="used_2"/>
+      <arc head="on_2" kind="INPUT" mult-k="1.1291992187500002" tail="idle_2">
+        <point x="73.85986328125" y="15.068164062500003"/>
       </arc>
-      <arc head="copy_Active" kind="OUTPUT" tail="copy_on"/>
-      <arc head="copy_off" kind="INPUT" tail="copy_Active"/>
-      <arc head="copy_Idle" kind="OUTPUT" mult-k="1.4737304687500004" tail="copy_off">
-        <point x="88.0" y="4.0"/>
+      <arc head="active_2" kind="OUTPUT" tail="on_2"/>
+      <arc head="off_2" kind="INPUT" tail="active_2"/>
+      <arc head="idle_2" kind="OUTPUT" mult-k="1.4737304687500004" tail="off_2">
+        <point x="74.0" y="5.0"/>
       </arc>
-      <arc head="copy_off_command" kind="OUTPUT" tail="copy_off"/>
-      <arc head="copy_on_command" kind="OUTPUT" tail="copy_on"/>
-      <arc head="no_event" kind="OUTPUT" tail="copy_able"/>
-      <arc head="copy_able" kind="INPUT" tail="process"/>
-      <arc head="copy_unable" kind="INPUT" tail="process"/>
-      <arc head="process" kind="OUTPUT" tail="copy_unable"/>
-      <arc head="copy_copy_able" kind="INPUT" tail="copy_copy_sensing"/>
-      <arc head="copy_copy_sensing" kind="OUTPUT" tail="copy_copy_switch_on"/>
-      <arc head="copy_copy_switch_off" kind="INPUT" tail="copy_copy_sensing"/>
-      <arc head="copy_copy_switch_off" kind="INPUT" tail="copy_copy_off_command"/>
-      <arc head="copy_copy_switch_on" kind="INPUT" tail="copy_copy_on_command"/>
-      <arc head="copy_copy_flushing" kind="INHIBITOR" tail="copy_copy_sensing"/>
-      <arc head="copy_copy_sensing" kind="OUTPUT" tail="copy_copy_able"/>
-      <arc head="copy_copy_unable" kind="INPUT" tail="copy_copy_sensing"/>
-      <arc head="copy_copy_sensing" kind="OUTPUT" tail="copy_copy_unable"/>
-      <arc head="copy_copy_flushing" kind="INPUT" tail="copy_copy_used"/>
-      <arc head="copy_copy_on" kind="INPUT" mult-k="1.1291992187500002" tail="copy_copy_Idle">
-        <point x="89.85986328125" y="31.068164062500003"/>
+      <arc head="off_command_2" kind="OUTPUT" tail="off_2"/>
+      <arc head="on_command_2" kind="OUTPUT" tail="on_2"/>
+      <arc head="no_event" kind="OUTPUT" tail="able_2"/>
+      <arc head="able_2" kind="INPUT" tail="hazard"/>
+      <arc head="unable_2" kind="INPUT" tail="hazard"/>
+      <arc head="hazard" kind="OUTPUT" tail="unable_2"/>
+      <arc head="able_3" kind="INPUT" tail="sensing_3"/>
+      <arc head="sensing_3" kind="OUTPUT" tail="switch_on_3"/>
+      <arc head="switch_off_3" kind="INPUT" tail="sensing_3"/>
+      <arc head="switch_off_3" kind="INPUT" tail="off_command_3"/>
+      <arc head="switch_on_3" kind="INPUT" tail="on_command_3"/>
+      <arc head="flushing_3" kind="INHIBITOR" tail="sensing_3"/>
+      <arc head="sensing_3" kind="OUTPUT" tail="able_3"/>
+      <arc head="unable_3" kind="INPUT" tail="sensing_3"/>
+      <arc head="sensing_3" kind="OUTPUT" tail="unable_3"/>
+      <arc head="flushing_3" kind="INPUT" tail="used_3"/>
+      <arc head="on_3" kind="INPUT" mult-k="1.1291992187500002" tail="idle_3">
+        <point x="73.85986328125" y="30.068164062500003"/>
       </arc>
-      <arc head="copy_copy_Active" kind="OUTPUT" tail="copy_copy_on"/>
-      <arc head="copy_copy_off" kind="INPUT" tail="copy_copy_Active"/>
-      <arc head="copy_copy_Idle" kind="OUTPUT" mult-k="1.4737304687500004" tail="copy_copy_off">
-        <point x="90.0" y="21.0"/>
+      <arc head="active_3" kind="OUTPUT" tail="on_3"/>
+      <arc head="off_3" kind="INPUT" tail="active_3"/>
+      <arc head="idle_3" kind="OUTPUT" mult-k="1.4737304687500004" tail="off_3">
+        <point x="74.0" y="20.0"/>
       </arc>
-      <arc head="copy_copy_off_command" kind="OUTPUT" tail="copy_copy_off"/>
-      <arc head="copy_copy_on_command" kind="OUTPUT" tail="copy_copy_on"/>
-      <arc head="copy_copy_used" kind="OUTPUT" tail="copy_copy_unable"/>
-      <arc head="copy_copy_able" kind="INHIBITOR" tail="copy_copy_used"/>
-      <arc head="copy_copy_unable" kind="INHIBITOR" tail="copy_copy_used"/>
-      <arc head="no_event" kind="OUTPUT" tail="copy_copy_able">
+      <arc head="off_command_3" kind="OUTPUT" tail="off_3"/>
+      <arc head="on_command_3" kind="OUTPUT" tail="on_3"/>
+      <arc head="used_3" kind="OUTPUT" tail="unable_3"/>
+      <arc head="able_3" kind="INHIBITOR" tail="used_3"/>
+      <arc head="unable_3" kind="INHIBITOR" tail="used_3"/>
+      <arc head="no_event" kind="OUTPUT" tail="able_3">
         <point x="28.0" y="19.0"/>
       </arc>
-      <arc head="copy_copy_able" kind="INPUT" tail="process">
-        <point x="46.5" y="23.5"/>
-        <point x="47.0" y="23.5"/>
+      <arc head="able_3" kind="INPUT" mult-k="0.74482421875" tail="hazard">
+        <point x="37.0" y="31.0"/>
       </arc>
-      <arc head="copy_copy_unable" kind="INPUT" tail="process">
+      <arc head="unable_3" kind="INPUT" tail="hazard">
         <point x="39.0" y="35.5"/>
-        <point x="67.5" y="35.5"/>
+        <point x="54.0" y="35.5"/>
       </arc>
-      <arc head="process" kind="OUTPUT" tail="copy_copy_unable">
-        <point x="56.0" y="36.5"/>
-        <point x="31.5" y="36.5"/>
-      </arc>
-    </edges>
-  </gspn>
-  <gspn name="two_interleaved" show-color-cmd="false" show-fluid-cmd="false">
-    <nodes>
-      <place label-x="-2.5" label-y="-1.5" marking="1" name="no_event" superpos-y="1.5" x="14.0" y="25.0"/>
-      <transition delay="EventStartRate" delay-x="-1.5" delay-y="1.5" name="activation" nservers-x="0.5" type="EXP" x="18.55" y="25.0"/>
-      <transition delay="EventEndRate" delay-x="-2.0" delay-y="1.5" name="deactivation" nservers-x="0.5" type="EXP" x="35.55" y="25.0"/>
-      <template last-binding="0.05" name="EventStartRate" type="REAL" x="2.0" y="6.0"/>
-      <template last-binding="0.001" name="EventEndRate" type="REAL" x="2.0" y="4.0"/>
-      <place label-x="-2.0" label-y="-1.5" name="sensing" x="13.0" y="10.0"/>
-      <transition label-x="-1.5" label-y="0.0" name="able" rotation="-0.0" type="IMM" weight="DetectionProb_1" weight-x="2.5" weight-y="-2.0" x="7.85" y="17.0"/>
-      <transition label-y="1.5" name="switch_on" superpos-x="1.0" superpos-y="0.5" type="IMM" x="17.85" y="10.0"/>
-      <transition label-x="-2.0" name="switch_off" superpos-x="1.0" superpos-y="0.5" type="IMM" x="17.85" y="6.0"/>
-      <place label-y="-1.5" name="on_command" superpos-y="1.5" superposition-tags="on" x="20.0" y="10.0"/>
-      <place label-y="-1.5" name="off_command" superpos-y="1.5" superposition-tags="off" x="20.0" y="6.0"/>
-      <transition label-y="-1.0" name="flushing" rotation="1.5707963267948966" superpos-x="2.0" superpos-y="0.5" type="IMM" x="13.85" y="14.0"/>
-      <template last-binding="0.6" name="DetectionProb_1" type="REAL" x="2.0" y="2.0"/>
-      <transition label-x="2.0" label-y="0.0" name="unable" rotation="-0.0" type="IMM" weight="UnDetectionProb_1" weight-x="8.5" weight-y="-2.0" x="19.85" y="17.0"/>
-      <place label-x="2.5" label-y="-1.0" name="process" superpos-y="1.5" superposition-tags="request" x="26.0" y="25.0"/>
-      <place name="used" x="13.0" y="17.0"/>
-      <place label-x="-2.5" label-y="0.0" name="Active" x="68.0" y="24.0"/>
-      <transition delay="InRate" delay-x="0.0" delay-y="1.5" label-x="-1.0" label-y="-1.0" name="on" nservers-x="0.5" rotation="1.5707963267948966" type="EXP" x="68.55" y="29.0"/>
-      <transition delay="OffRate" delay-x="1.0" name="off" nservers-x="0.5" rotation="1.5707963267948966" type="EXP" x="68.55" y="19.0"/>
-      <template last-binding="0.1" name="InRate" type="REAL" x="2.0" y="8.0"/>
-      <template last-binding="1" name="OffRate" type="REAL" x="2.0" y="10.0"/>
-      <place label-x="-2.0" label-y="-1.5" name="copy_sensing" x="59.0" y="7.0"/>
-      <transition label-x="-1.5" label-y="0.0" name="copy_able" rotation="-0.0" type="IMM" weight="DetectionProb_2" weight-x="2.5" weight-y="-2.0" x="53.85" y="14.0"/>
-      <transition label-y="1.5" name="copy_switch_on" superpos-x="1.0" superpos-y="0.5" type="IMM" x="63.85" y="7.0"/>
-      <transition label-x="-2.0" name="copy_switch_off" superpos-x="1.0" superpos-y="0.5" type="IMM" x="63.85" y="3.0"/>
-      <place label-y="-1.5" name="copy_on_command" superpos-y="1.5" superposition-tags="on" x="66.0" y="7.0"/>
-      <place label-y="-1.5" name="copy_off_command" superpos-y="1.5" superposition-tags="off" x="66.0" y="3.0"/>
-      <transition label-y="-1.0" name="copy_flushing" rotation="1.5707963267948966" superpos-x="2.0" superpos-y="0.5" type="IMM" x="59.85" y="11.0"/>
-      <template last-binding="0.4" name="DetectionProb_2" type="REAL" x="11.0" y="2.0"/>
-      <transition label-x="2.0" label-y="0.0" name="copy_unable" rotation="-0.0" type="IMM" weight="UnDetectionProb_2" weight-x="8.5" weight-y="-2.0" x="65.85" y="14.0"/>
-      <place name="copy_used" x="59.0" y="14.0"/>
-      <place label-x="2.5" label-y="0.0" marking="1" name="copy_Idle" x="87.0" y="24.0"/>
-      <place label-x="-2.5" label-y="0.0" name="copy_Active" x="82.0" y="24.0"/>
-      <transition delay="InRate_2" delay-x="0.0" delay-y="1.5" label-x="-1.0" label-y="-1.0" name="copy_on" nservers-x="0.5" rotation="1.5707963267948966" type="EXP" x="82.55" y="29.0"/>
-      <transition delay="OffRate_2" delay-x="1.0" name="copy_off" nservers-x="0.5" rotation="1.5707963267948966" type="EXP" x="82.55" y="19.0"/>
-      <template last-binding="0.0" name="InRate_2" type="REAL" x="28.0" y="4.0"/>
-      <template last-binding="0.0" name="OffRate_2" type="REAL" x="28.0" y="2.0"/>
-      <template last-binding="0.6" name="UnDetectionProb_1" type="REAL" x="3.0" y="32.0"/>
-      <template last-binding="0.4" name="UnDetectionProb_2" type="REAL" x="15.0" y="32.0"/>
-    </nodes>
-    <edges>
-      <arc head="activation" kind="INPUT" tail="no_event"/>
-      <arc head="process" kind="OUTPUT" tail="activation"/>
-      <arc head="deactivation" kind="INPUT" tail="process"/>
-      <arc head="no_event" kind="OUTPUT" mult-k="0.50009765625" mult-x="0.6478902170605423" mult-y="1.4591560868242173" tail="deactivation">
-        <point x="38.5" y="26.0"/>
-        <point x="38.5" y="29.0"/>
-        <point x="12.5" y="29.0"/>
-        <point x="12.50449259402326" y="27.637405493841477"/>
-        <point x="12.5" y="26.0"/>
-      </arc>
-      <arc head="able" kind="INPUT" tail="sensing"/>
-      <arc head="sensing" kind="OUTPUT" tail="switch_on"/>
-      <arc head="switch_off" kind="INPUT" tail="sensing"/>
-      <arc head="switch_off" kind="INPUT" tail="off_command"/>
-      <arc head="switch_on" kind="INPUT" tail="on_command"/>
-      <arc head="flushing" kind="INHIBITOR" tail="sensing"/>
-      <arc head="sensing" kind="OUTPUT" tail="able"/>
-      <arc head="unable" kind="INPUT" tail="sensing"/>
-      <arc head="sensing" kind="OUTPUT" tail="unable"/>
-      <arc head="unable" kind="INPUT" tail="process"/>
-      <arc head="process" kind="OUTPUT" tail="unable"/>
-      <arc head="used" kind="OUTPUT" tail="unable"/>
-      <arc head="unable" kind="INHIBITOR" tail="used"/>
-      <arc head="able" kind="INHIBITOR" tail="used"/>
-      <arc head="flushing" kind="INPUT" tail="used"/>
-      <arc head="able" kind="INPUT" tail="process"/>
-      <arc head="Active" kind="OUTPUT" tail="on"/>
-      <arc head="off" kind="INPUT" tail="Active"/>
-      <arc head="off_command" kind="OUTPUT" tail="off"/>
-      <arc head="on_command" kind="OUTPUT" tail="on"/>
-      <arc head="no_event" kind="OUTPUT" tail="able"/>
-      <arc head="copy_able" kind="INPUT" tail="copy_sensing"/>
-      <arc head="copy_sensing" kind="OUTPUT" tail="copy_switch_on"/>
-      <arc head="copy_switch_off" kind="INPUT" tail="copy_sensing"/>
-      <arc head="copy_switch_off" kind="INPUT" tail="copy_off_command"/>
-      <arc head="copy_switch_on" kind="INPUT" tail="copy_on_command"/>
-      <arc head="copy_flushing" kind="INHIBITOR" tail="copy_sensing"/>
-      <arc head="copy_sensing" kind="OUTPUT" tail="copy_able"/>
-      <arc head="copy_unable" kind="INPUT" tail="copy_sensing"/>
-      <arc head="copy_sensing" kind="OUTPUT" tail="copy_unable"/>
-      <arc head="copy_used" kind="OUTPUT" tail="copy_unable"/>
-      <arc head="copy_unable" kind="INHIBITOR" tail="copy_used"/>
-      <arc head="copy_able" kind="INHIBITOR" tail="copy_used"/>
-      <arc head="copy_flushing" kind="INPUT" tail="copy_used"/>
-      <arc head="copy_on" kind="INPUT" mult-k="1.1291992187500002" tail="copy_Idle">
-        <point x="87.85986328125" y="30.068164062500003"/>
-      </arc>
-      <arc head="copy_Active" kind="OUTPUT" tail="copy_on"/>
-      <arc head="copy_off" kind="INPUT" tail="copy_Active"/>
-      <arc head="copy_Idle" kind="OUTPUT" mult-k="1.4737304687500004" tail="copy_off">
-        <point x="88.0" y="20.0"/>
-      </arc>
-      <arc head="copy_off_command" kind="OUTPUT" tail="copy_off"/>
-      <arc head="copy_on_command" kind="OUTPUT" tail="copy_on"/>
-      <arc head="no_event" kind="OUTPUT" tail="copy_able"/>
-      <arc head="copy_able" kind="INPUT" tail="process"/>
-      <arc head="copy_unable" kind="INPUT" tail="process"/>
-      <arc head="process" kind="OUTPUT" tail="copy_unable"/>
-      <arc head="copy_Idle" kind="OUTPUT" tail="off"/>
-      <arc head="on" kind="INPUT" tail="copy_Idle"/>
-    </edges>
-  </gspn>
-  <gspn name="most_effective" show-color-cmd="false" show-fluid-cmd="false" zoom="125">
-    <nodes>
-      <place label-x="-2.5" label-y="-1.5" marking="1" name="no_event" superpos-y="1.5" x="14.0" y="25.0"/>
-      <transition delay="EventStartRate" delay-x="-1.5" delay-y="1.5" name="activation" nservers-x="0.5" type="EXP" x="18.55" y="25.0"/>
-      <transition delay="EventEndRate" delay-x="-2.0" delay-y="1.5" name="deactivation" nservers-x="0.5" type="EXP" x="35.55" y="25.0"/>
-      <template last-binding="0.05" name="EventStartRate" type="REAL" x="2.0" y="6.0"/>
-      <template last-binding="0.001" name="EventEndRate" type="REAL" x="2.0" y="4.0"/>
-      <place label-x="-2.0" label-y="-1.5" name="sensing" x="13.0" y="10.0"/>
-      <transition label-x="-1.5" label-y="0.0" name="able" rotation="-0.0" type="IMM" weight="DetectionProb_1" weight-x="2.5" weight-y="-2.0" x="7.85" y="17.0"/>
-      <transition label-y="1.5" name="switch_on" superpos-x="1.0" superpos-y="0.5" type="IMM" x="17.85" y="10.0"/>
-      <transition label-x="-2.0" name="switch_off" superpos-x="1.0" superpos-y="0.5" type="IMM" x="17.85" y="6.0"/>
-      <place label-y="-1.5" name="on_command" superpos-y="1.5" superposition-tags="on" x="20.0" y="10.0"/>
-      <place label-y="-1.5" name="off_command" superpos-y="1.5" superposition-tags="off" x="20.0" y="6.0"/>
-      <transition label-y="-1.0" name="flushing" rotation="1.5707963267948966" superpos-x="2.0" superpos-y="0.5" type="IMM" x="13.85" y="14.0"/>
-      <template last-binding="0.6" name="DetectionProb_1" type="REAL" x="2.0" y="2.0"/>
-      <transition label-x="2.0" label-y="0.0" name="unable" rotation="-0.0" type="IMM" weight="UnDetectionProb_1" weight-x="8.5" weight-y="-2.0" x="19.85" y="17.0"/>
-      <place label-x="2.5" label-y="-1.0" name="process" superpos-y="1.5" superposition-tags="request" x="26.0" y="25.0"/>
-      <place name="used" x="13.0" y="17.0"/>
-      <place label-x="-2.5" label-y="0.0" name="Active" x="51.0" y="26.0"/>
-      <transition delay="InRate" delay-x="0.0" delay-y="1.5" label-x="-1.0" label-y="-1.0" name="on" nservers-x="0.5" rotation="1.5707963267948966" type="EXP" x="51.55" y="31.0"/>
-      <transition delay="OffRate" delay-x="1.0" name="off" nservers-x="0.5" rotation="1.5707963267948966" type="EXP" x="51.55" y="21.0"/>
-      <template last-binding="0.1" name="InRate" type="REAL" x="2.0" y="8.0"/>
-      <template last-binding="1" name="OffRate" type="REAL" x="2.0" y="10.0"/>
-      <place label-x="-2.0" label-y="-1.5" name="copy_sensing" x="59.0" y="7.0"/>
-      <transition label-x="-1.5" label-y="0.0" name="copy_able" rotation="-0.0" type="IMM" weight="DetectionProb_2" weight-x="2.5" weight-y="-2.0" x="53.85" y="14.0"/>
-      <transition label-y="1.5" name="copy_switch_on" superpos-x="1.0" superpos-y="0.5" type="IMM" x="63.85" y="7.0"/>
-      <transition label-x="-2.0" name="copy_switch_off" superpos-x="1.0" superpos-y="0.5" type="IMM" x="63.85" y="3.0"/>
-      <place label-y="-1.5" name="copy_on_command" superpos-y="1.5" superposition-tags="on" x="66.0" y="7.0"/>
-      <place label-y="-1.5" name="copy_off_command" superpos-y="1.5" superposition-tags="off" x="66.0" y="3.0"/>
-      <transition label-y="-1.0" name="copy_flushing" rotation="1.5707963267948966" superpos-x="2.0" superpos-y="0.5" type="IMM" x="59.85" y="11.0"/>
-      <template last-binding="0.4" name="DetectionProb_2" type="REAL" x="11.0" y="2.0"/>
-      <transition label-x="2.0" label-y="0.0" name="copy_unable" rotation="-0.0" type="IMM" weight="UnDetectionProb_2" weight-x="8.5" weight-y="-2.0" x="65.85" y="14.0"/>
-      <place name="copy_used" x="59.0" y="14.0"/>
-      <place label-x="2.5" label-y="0.0" marking="1" name="copy_Idle" x="61.0" y="21.0"/>
-      <place label-x="-2.5" label-y="0.0" name="copy_Active" x="72.0" y="27.0"/>
-      <transition delay="InRate_2" delay-x="0.0" delay-y="1.5" label-x="-1.0" label-y="-1.0" name="copy_on" nservers-x="0.5" rotation="1.5707963267948966" type="EXP" x="72.55" y="32.0"/>
-      <transition delay="OffRate_2" delay-x="1.0" name="copy_off" nservers-x="0.5" rotation="1.5707963267948966" type="EXP" x="72.55" y="21.0"/>
-      <template last-binding="0.0" name="InRate_2" type="REAL" x="28.0" y="4.0"/>
-      <template last-binding="0.0" name="OffRate_2" type="REAL" x="28.0" y="2.0"/>
-      <transition name="t0" rotation="1.5707963267948966" type="IMM" weight="DetectionProb_1" weight-x="3.5" weight-y="1.5" x="57.85" y="30.0"/>
-      <transition name="t1" rotation="1.5707963267948966" type="IMM" weight="DetectionProb_2" weight-x="4.0" x="64.85" y="30.0"/>
-      <place name="P0" x="57.0" y="34.0"/>
-      <place name="P1" x="64.0" y="34.0"/>
-      <template last-binding="0.6" name="UnDetectionProb_1" type="REAL" x="3.0" y="32.0"/>
-      <template last-binding="0.4" name="UnDetectionProb_2" type="REAL" x="14.0" y="32.0"/>
-    </nodes>
-    <edges>
-      <arc head="activation" kind="INPUT" tail="no_event"/>
-      <arc head="process" kind="OUTPUT" tail="activation"/>
-      <arc head="deactivation" kind="INPUT" tail="process"/>
-      <arc head="no_event" kind="OUTPUT" mult-k="0.50009765625" mult-x="0.6478902170605423" mult-y="1.4591560868242173" tail="deactivation">
-        <point x="38.5" y="26.0"/>
-        <point x="38.5" y="29.0"/>
-        <point x="12.5" y="29.0"/>
-        <point x="12.50449259402326" y="27.637405493841477"/>
-        <point x="12.5" y="26.0"/>
-      </arc>
-      <arc head="able" kind="INPUT" tail="sensing"/>
-      <arc head="sensing" kind="OUTPUT" tail="switch_on"/>
-      <arc head="switch_off" kind="INPUT" tail="sensing"/>
-      <arc head="switch_off" kind="INPUT" tail="off_command"/>
-      <arc head="switch_on" kind="INPUT" tail="on_command"/>
-      <arc head="flushing" kind="INHIBITOR" tail="sensing"/>
-      <arc head="sensing" kind="OUTPUT" tail="able"/>
-      <arc head="unable" kind="INPUT" tail="sensing"/>
-      <arc head="sensing" kind="OUTPUT" tail="unable"/>
-      <arc head="unable" kind="INPUT" tail="process"/>
-      <arc head="process" kind="OUTPUT" tail="unable"/>
-      <arc head="used" kind="OUTPUT" tail="unable"/>
-      <arc head="unable" kind="INHIBITOR" tail="used"/>
-      <arc head="able" kind="INHIBITOR" tail="used"/>
-      <arc head="flushing" kind="INPUT" tail="used"/>
-      <arc head="able" kind="INPUT" tail="process"/>
-      <arc head="Active" kind="OUTPUT" tail="on"/>
-      <arc head="off" kind="INPUT" tail="Active"/>
-      <arc head="off_command" kind="OUTPUT" tail="off"/>
-      <arc head="on_command" kind="OUTPUT" tail="on"/>
-      <arc head="no_event" kind="OUTPUT" tail="able"/>
-      <arc head="copy_able" kind="INPUT" tail="copy_sensing"/>
-      <arc head="copy_sensing" kind="OUTPUT" tail="copy_switch_on"/>
-      <arc head="copy_switch_off" kind="INPUT" tail="copy_sensing"/>
-      <arc head="copy_switch_off" kind="INPUT" tail="copy_off_command"/>
-      <arc head="copy_switch_on" kind="INPUT" tail="copy_on_command"/>
-      <arc head="copy_flushing" kind="INHIBITOR" tail="copy_sensing"/>
-      <arc head="copy_sensing" kind="OUTPUT" tail="copy_able"/>
-      <arc head="copy_unable" kind="INPUT" tail="copy_sensing"/>
-      <arc head="copy_sensing" kind="OUTPUT" tail="copy_unable"/>
-      <arc head="copy_used" kind="OUTPUT" tail="copy_unable"/>
-      <arc head="copy_unable" kind="INHIBITOR" tail="copy_used"/>
-      <arc head="copy_able" kind="INHIBITOR" tail="copy_used"/>
-      <arc head="copy_flushing" kind="INPUT" tail="copy_used"/>
-      <arc head="copy_Active" kind="OUTPUT" tail="copy_on"/>
-      <arc head="copy_off" kind="INPUT" tail="copy_Active"/>
-      <arc head="copy_Idle" kind="OUTPUT" mult-k="0.3602539062500001" tail="copy_off"/>
-      <arc head="copy_off_command" kind="OUTPUT" tail="copy_off"/>
-      <arc head="copy_on_command" kind="OUTPUT" tail="copy_on"/>
-      <arc head="no_event" kind="OUTPUT" tail="copy_able"/>
-      <arc head="copy_able" kind="INPUT" tail="process"/>
-      <arc head="copy_unable" kind="INPUT" tail="process"/>
-      <arc head="process" kind="OUTPUT" tail="copy_unable"/>
-      <arc head="copy_Idle" kind="OUTPUT" tail="off"/>
-      <arc head="t0" kind="INPUT" tail="copy_Idle"/>
-      <arc head="t1" kind="INPUT" tail="copy_Idle"/>
-      <arc head="P0" kind="OUTPUT" tail="t0"/>
-      <arc head="P1" kind="OUTPUT" tail="t1"/>
-      <arc head="on" kind="INPUT" tail="P0">
-        <point x="51.5" y="35.0"/>
-      </arc>
-      <arc head="copy_on" kind="INPUT" tail="P1">
-        <point x="72.5" y="35.0"/>
+      <arc head="hazard" kind="OUTPUT" tail="unable_3">
+        <point x="42.0" y="36.5"/>
+        <point x="34.0" y="36.5"/>
       </arc>
     </edges>
   </gspn>
-  <measures gspn-name="one_sensor" name="Steady State analysis of one_sensor" rapid-type="STEADY_STATE_SOLUTION" simplified-UI="true">
-    <assignments>
-      <assignment bind-model="SINGLE_VALUE" single-val="" type="REAL" varname="EventStartRate"/>
-      <assignment bind-model="SINGLE_VALUE" single-val="" type="REAL" varname="EventEndRate"/>
-      <assignment bind-model="SINGLE_VALUE" single-val="" type="REAL" varname="DetectionProb"/>
-      <assignment bind-model="SINGLE_VALUE" single-val="" type="REAL" varname="InRate"/>
-      <assignment bind-model="SINGLE_VALUE" single-val="" type="REAL" varname="OffRate"/>
-      <assignment bind-model="SINGLE_VALUE" single-val="" type="REAL" varname="UnDetectionProb"/>
-    </assignments>
-    <greatspn/>
-    <formulas>
-      <formula language="STAT"/>
-      <formula language="RG"/>
-      <formula language="ALL"/>
-    </formulas>
-  </measures>
-  <measures gspn-name="phenomenon" name="Steady State analysis of phenomenon" rapid-type="STEADY_STATE_SOLUTION" simplified-UI="true">
-    <assignments>
-      <assignment bind-model="RANGE" range-from="" range-step="" range-to="" type="REAL" varname="EventStartRate"/>
-      <assignment bind-model="SINGLE_VALUE" single-val="" type="REAL" varname="EventEndRate"/>
-    </assignments>
-    <greatspn/>
-    <formulas>
-      <formula language="STAT"/>
-      <formula language="RG"/>
-      <formula language="ALL"/>
-    </formulas>
-  </measures>
 </project>
