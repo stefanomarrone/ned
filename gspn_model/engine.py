@@ -25,13 +25,13 @@ class Engine:
     def execute(self):
         self.gspn_handler.generic_analysis(self.model, self.model_repo, self.getParamList())
 
-    def safety(self):
+    def safety(self) -> float:
         transition_names = self.measures['safety']
         values = list(map(self.get_throughput, transition_names))
         retval = 1 / sum(values)
         return retval
 
-    def sustainability(self):
+    def sustainability(self) -> float:
         place_names = self.measures['sustainability']
         values = list(map(self.__c_readtpd_wrapper, place_names))
         values = list(map(lambda x: 1 / x, values))
