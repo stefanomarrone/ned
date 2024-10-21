@@ -85,8 +85,8 @@ class PlainModelFactory:
         },
         2: {
             'interleaved': ('two_interleaved', 'two', 'dos'),
-            'most_effective': ('most_effective', 'two', 'dos'),
-            'default': ('two_sensor', 'two', 'dos')
+            'most_effective': ('two_most_probable', 'two', 'dos'),
+            'default': ('two_sensors', 'two', 'dos')
         },
         3: {'default': ('three_sensors', 'three', 'tres')}
     }
