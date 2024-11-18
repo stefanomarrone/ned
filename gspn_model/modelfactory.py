@@ -34,8 +34,8 @@ class PlainModelFactory:
         'two': {
             'EventStartRate': lambda conf: PlainModelFactory.simple(conf, 'process', 'activation_rate'),
             'EventEndRate': lambda conf: PlainModelFactory.simple(conf, 'process', 'deactivation_rate'),
-            'InRate_1': lambda conf: PlainModelFactory.simple(conf, 'scheduler', 'on_rate'),
-            'OffRate_1': lambda conf: PlainModelFactory.simple(conf, 'scheduler', 'off_rate'),
+            'InRate': lambda conf: PlainModelFactory.simple(conf, 'scheduler', 'on_rate'),
+            'OffRate': lambda conf: PlainModelFactory.simple(conf, 'scheduler', 'off_rate'),
             'InRate_2': lambda conf: PlainModelFactory.simple(conf, 'scheduler', 'on_rate'),
             'OffRate_2': lambda conf: PlainModelFactory.simple(conf, 'scheduler', 'off_rate'),
             'DetectionProb_1': lambda conf: PlainModelFactory.indexed(conf, 'sensors', 0, 'detection_probability'),
@@ -108,12 +108,16 @@ class PlainModelFactory:
         numbers: int = PlainModelFactory.get_sensor_number(gspn_parameters)
         default = PlainModelFactory.model_kb[numbers].get('default')
         scheduling_policy = gspn_parameters['scheduler']['kind']
-        model_name, configuration_label, measures_label = PlainModelFactory.model_kb[numbers].get(scheduling_policy, default)
+        model_name, configuration_label, measures_label = PlainModelFactory.model_kb[numbers].get(scheduling_policy,
+                                                                                                  default)
         configuration = PlainModelFactory.configurations[configuration_label]
         measures = PlainModelFactory.measures[measures_label]
+        configuration_copy = configuration.copy()
         for key in configuration.keys():
             func = configuration[key]
             value = func(gspn_parameters)
-            configuration[key] = value
-        engine = Engine(model_name, repository_folder, configuration, measures, gspn_parameters)
+            # configuration[key] = value       ERROR
+            # In this way configuration is overwritten and it is not possible to have another iteration!!!
+            configuration_copy[key] = value
+        engine = Engine(model_name, repository_folder, configuration_copy, measures, gspn_parameters)
         return engine

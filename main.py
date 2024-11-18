@@ -1,7 +1,7 @@
 import sys
 from bayes.bayesian import Network
 from domain.geometry import Geometry
-from domain.results import Results
+from domain.results import Results, ActivationRateException
 from domain.sensors import Sensor
 from domain.utils import transport_formula, Asset
 from domain.factory import ProcessFactoryRegistry
@@ -66,6 +66,12 @@ def make_global_parameters(analysis, activation_rate, deactivation_rate, config)
     return retval
 
 
+def draw(config, geometry: Geometry, results: Results):
+    out_folder = config.get('outfolder')
+    geometry.draw(out_folder)
+    results.draw(out_folder)
+
+
 def core(configuration_filename, draw_flag):
     safety_measure = 0
     sustainability_measure = 0
@@ -81,8 +87,14 @@ def core(configuration_filename, draw_flag):
         analysis = network.analysis()
         error = not bool(analysis)
         if not error:
-            activation_rate, deactivation_rate = results.get_process_activation_deactivation_rates()
-            error = activation_rate == 0 or deactivation_rate == 0
+            try:
+                activation_rate, deactivation_rate = results.get_process_activation_deactivation_rates()
+            except ActivationRateException as e:
+                print(e.message)
+                if draw_flag:
+                    draw(config, geometry, results)
+                exit(-1)
+            # error = activation_rate == 0 or deactivation_rate == 0
             global_parameters = make_global_parameters(analysis, activation_rate, deactivation_rate, config)
             gspn_repo = config.get('greatspn_repos')
             engine: Engine = PlainModelFactory.generate(global_parameters, gspn_repo)
@@ -90,9 +102,7 @@ def core(configuration_filename, draw_flag):
             safety_measure = engine.safety()  # mean* global_parameters['numero'];
             sustainability_measure = engine.sustainability()
     if draw_flag:
-        out_folder = config.get('outfolder')
-        geometry.draw(out_folder)
-        results.draw(out_folder)
+        draw(config, geometry, results)
     return safety_measure, sustainability_measure
 
 

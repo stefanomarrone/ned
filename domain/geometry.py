@@ -6,6 +6,8 @@ from domain.areaofinterest import AreaOfInterest
 from domain.process import Process
 from domain.sensors import Sensor
 import matplotlib.pyplot as plt
+import matplotlib.patches as patches
+
 import numpy as np
 from domain.utils import Place
 
@@ -17,43 +19,68 @@ class Geometry:
         self.aoi = aoi
 
     def draw(self, out_folder: Optional = None):
-        grid_size = 21  # fixed size for draw simplicity
+        grid_size = 11  # fixed size for draw simplicity
         half_grid = (grid_size - 1) // 2  # This will help place (0,0) in the center
 
         def convert_to_grid_coords(x, y):
             # Shift the coordinates to place (0,0) in the center of the grid
-            grid_x = int(x + half_grid)
-            grid_y = int(y + half_grid)
+            grid_x = x + half_grid
+            grid_y = y + half_grid
             return grid_x, grid_y
 
-        # Create a grid and set all to white initially
-        grid = np.ones((grid_size, grid_size, 3))  # NxN pixels with RGB channels
-        # Set Area of Interest to green
+        fig, ax = plt.subplots(figsize=(8, 8))
+        # Plot grid background
+        ax.set_xlim(-half_grid, half_grid)
+        ax.set_ylim(-half_grid, half_grid)
+        ax.set_aspect('equal')
+        ax.set_xticks(np.arange(-half_grid, half_grid + 1, 1))
+        ax.set_yticks(np.arange(-half_grid, half_grid + 1, 1))
+        ax.grid(True)
+        ax.set_xlabel("x")
+        ax.set_ylabel("y")
+        ax.set_title("Geometry Map")
+
+        sensor_patch = patches.Circle((0, 0), radius=0.4, color="blue", label="Sensors: Circles")
+        aoi_patch = patches.RegularPolygon((0, 0), numVertices=3, radius=0.4, color="green",
+                                           label="AoI: Triangle")
+        process_patch = patches.Rectangle((0, 0), width=0.8, height=0.8, color="red", label="Process: Square")
+
+        # Draw Area of Interest as green triangles
         for aoi in self.aoi:
             grid_x_aoi, grid_y_aoi = convert_to_grid_coords(aoi.x, aoi.y)
-            grid[grid_size - grid_y_aoi - 1, grid_x_aoi] = [0, 1, 0]  # RGB for green
-        # Set Process to red
+            triangle = patches.RegularPolygon(
+                (grid_x_aoi - half_grid, grid_y_aoi - half_grid),  # position
+                numVertices=3,  # triangle
+                radius=0.5,  # size
+                orientation=0,  # pointing up
+                color="green"
+            )
+            ax.add_patch(triangle)
+
+        # Draw Process as red square
         grid_x_process, grid_y_process = convert_to_grid_coords(self.process.place.x, self.process.place.y)
-        grid[grid_size - grid_y_process - 1, grid_x_process] = [1, 0, 0]  # RGB for red
-        # Set Sensors to grey
+        square = patches.Rectangle(
+            (grid_x_process - half_grid - 0.4, grid_y_process - half_grid - 0.4),
+            0.8, 0.8, color="red"
+        )
+        ax.add_patch(square)
+
+        # Draw Sensors as blue circles
         for s in self.sensors:
             grid_x_sensor, grid_y_sensor = convert_to_grid_coords(s.place.x, s.place.y)
-            grid[grid_size - grid_y_sensor - 1, grid_x_sensor] = [0, 0, 1]  # RGB for blue
-        # Plot the grid
-        plt.imshow(grid, extent=(-half_grid, half_grid, -half_grid, half_grid))
-        plt.grid(True)
-        # Add x and y axis labels
-        plt.xlabel("x")
-        plt.ylabel("y")
-        # Show x and y ticks at regular intervals
-        plt.xticks(np.arange(-half_grid, half_grid + 1, 1))
-        plt.yticks(np.arange(-half_grid, half_grid + 1, 1))
-        plt.title('Geometry Map')
+            circle = patches.Circle(
+                (grid_x_sensor - half_grid, grid_y_sensor - half_grid),
+                radius=0.4, color="blue"
+            )
+            ax.add_patch(circle)
+        ax.legend(handles=[sensor_patch, aoi_patch, process_patch], loc="upper right", title="Legend")
+
+        # Save or show the figure
         if out_folder is not None:
             path = f'{os.getcwd()}/{out_folder}'
-            if os.path.exists(path) is not True:
+            if not os.path.exists(path):
                 os.mkdir(path)
-            plt.savefig(out_folder + "geometry.pdf", format="pdf", bbox_inches="tight")
+            plt.savefig(f"{out_folder}/geometry.pdf", format="pdf", bbox_inches="tight")
         else:
             plt.show()
 

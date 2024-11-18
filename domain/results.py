@@ -2,6 +2,13 @@ from matplotlib import pyplot as plt
 import pandas as pd
 
 
+class ActivationRateException(Exception):
+    def __init__(self, message):
+        # Call the base class constructor with the parameters it needs
+        super().__init__(message)
+        self.message = message
+
+
 class Results:
 
     def __init__(self, pprocess, ssensors, aassets, tthresholds):
@@ -101,5 +108,7 @@ class Results:
             activations = 1 / self.get_process_rate(False)
             deactivations = 1 / self.get_process_rate(True)
         except Exception as s:
-            pass
+            print(s)
+            e = ActivationRateException(message='Activation or Deactivation rate is 0!!')
+            raise e
         return activations, deactivations
