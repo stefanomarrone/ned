@@ -50,6 +50,8 @@ class FileProcessFactory(ProcessFactory):
                 column[h] = []
             for row in reader:
                 for h, v in zip(headers, row):
+                    if h != 'Data' and h != 'Ora':
+                        v = int(v)
                     column[h].append(v)
         return FileProcess(data=column['Coincidenze analizzate'])
 

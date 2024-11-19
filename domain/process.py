@@ -5,6 +5,13 @@ import numpy as np
 from domain.utils import Place, ProbabilisticCharacterization
 
 
+class NoMoreDataException(Exception):
+    def __init__(self, message):
+        # Call the base class constructor with the parameters it needs
+        super().__init__(message)
+        self.message = message
+
+
 class Process:
     def __init__(self):
         # the Process is placed at the origin
@@ -54,6 +61,13 @@ class FileProcess(Process):
     def __init__(self, data):
         super().__init__()
         self.data = data
+        self.__n = -1
 
     def generate(self):
-        raise Exception('Metodo da implementare')
+        self.__n = self.__n + 1
+        if self.__n < len(self.data):
+            return self.data[self.__n]
+
+        else:
+            e = NoMoreDataException('No more data')
+            raise e

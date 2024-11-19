@@ -1,6 +1,7 @@
 import sys
 from bayes.bayesian import Network
 from domain.geometry import Geometry
+from domain.process import NoMoreDataException
 from domain.results import Results, ActivationRateException
 from domain.sensors import Sensor
 from domain.utils import transport_formula, Asset
@@ -17,7 +18,11 @@ def run_simulation(geometry: Geometry, num_steps):
     measures = {name: [] for name in sensor_names}
     aois = {idx: [] for idx in range(len(aoi_places))}
     for i in range(num_steps):
-        v = geometry.process.generate()
+        try:
+            v = geometry.process.generate()
+        except NoMoreDataException as e:
+            print(e.message)
+            break
         process.append(v)
         for s in geometry.sensors:
             name = s.getName()
@@ -93,7 +98,7 @@ def core(configuration_filename, draw_flag):
                 print(e.message)
                 if draw_flag:
                     draw(config, geometry, results)
-                exit(-1)
+                return safety_measure, sustainability_measure
             # error = activation_rate == 0 or deactivation_rate == 0
             global_parameters = make_global_parameters(analysis, activation_rate, deactivation_rate, config)
             gspn_repo = config.get('greatspn_repos')
