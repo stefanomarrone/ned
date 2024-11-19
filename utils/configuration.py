@@ -10,7 +10,8 @@ from utils.utils import tostring
 class Configuration(metaclass=Singleton):
     process_registry = {
         'spike': [('range', float), ('rate', float), ('mu', float), ('sigma', float), ('level', float)],
-        'walk': [('drift', float), ('mu', float), ('sigma', float), ('level', float)]
+        'walk': [('drift', float), ('mu', float), ('sigma', float), ('level', float)],
+        'file': [('filename', str),('filepath', str)]
     }
 
     def __init__(self, inifilename):

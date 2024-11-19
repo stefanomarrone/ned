@@ -48,3 +48,12 @@ class SpikeProcess(Process):
 
     def __probabilistic_return(self):
         return choice(self.spike_range) if random() < self.spike_rate else 0
+
+
+class FileProcess(Process):
+    def __init__(self, data):
+        super().__init__()
+        self.data = data
+
+    def generate(self):
+        raise Exception('Metodo da implementare')
