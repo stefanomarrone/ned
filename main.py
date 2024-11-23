@@ -1,3 +1,4 @@
+import math
 import sys
 from bayes.bayesian import Network
 from domain.geometry import Geometry
@@ -78,8 +79,8 @@ def draw(config, geometry: Geometry, results: Results):
 
 
 def core(configuration_filename, draw_flag, ext_configuration=None):
-    safety_measure = 0
-    sustainability_measure = 0
+    safety_measure = math.inf
+    sustainability_measure = -math.inf
     if ext_configuration is None:
         config = Configuration(configuration_filename)
     else:
