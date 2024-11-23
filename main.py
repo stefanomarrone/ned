@@ -77,10 +77,13 @@ def draw(config, geometry: Geometry, results: Results):
     results.draw(out_folder)
 
 
-def core(configuration_filename, draw_flag):
+def core(configuration_filename, draw_flag, ext_configuration=None):
     safety_measure = 0
     sustainability_measure = 0
-    config = Configuration(configuration_filename)
+    if ext_configuration is None:
+        config = Configuration(configuration_filename)
+    else:
+        config = ext_configuration
     geometry = build(config)
     number_of_steps = config.get('simulation_steps')
     error = True

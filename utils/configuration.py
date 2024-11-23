@@ -11,13 +11,25 @@ class Configuration(metaclass=Singleton):
     process_registry = {
         'spike': [('range', float), ('rate', float), ('mu', float), ('sigma', float), ('level', float)],
         'walk': [('drift', float), ('mu', float), ('sigma', float), ('level', float)],
-        'file': [('filename', str),('filepath', str)]
+        'file': [('filename', str), ('filepath', str)]
     }
 
-    def __init__(self, inifilename):
+    def __init__(self, inifilename=None):
         self.board = dict()
+        if inifilename is not None:
+            self.init_from_filename(inifilename)
+
+    def init_from_filename(self, inifilename):
         content = self.preprocess(inifilename)
+        reader = ConfigParser()
+        inifile = io.StringIO(content)
+        reader.read_file(inifile)
+        self.load(reader)
+
+    def init_from_content(self, content):
         self.load(content)
+        return self
+        # raise Exception('Not yet implemented')
 
     def get(self, key):
         return self.board[key]
@@ -41,10 +53,7 @@ class Configuration(metaclass=Singleton):
         return temp
 
     # todo: dynamic configuration ready for the process is not implemented, yet
-    def load(self, content):
-        reader = ConfigParser()
-        inifile = io.StringIO(content)
-        reader.read_file(inifile)
+    def load(self, reader):
         try:
             # Main configuration
             temp = reader['main']['greatspn_bin']
@@ -58,12 +67,17 @@ class Configuration(metaclass=Singleton):
             temp = float(reader['main']['hazardlevel'])
             self.put('hazardlevel', temp)
             temp = reader['main']['asset']
-            temp = temp.split(',')
-            temp = tuple([float(i) for i in temp])
+            if type(temp) is str:
+                temp = temp.split(',')
+                temp = tuple([float(i) for i in temp])
+
             self.put('asset', temp)
             temp = reader['main']['sensors']
-            sensors = list(temp.split(','))
-            self.put('sensors', temp.split(','))
+            if type(temp) is str:
+                sensors = list(temp.split(','))
+            else:
+                sensors = temp
+            self.put('sensors', sensors)
             temp = reader['main']['process']
             self.put('process', temp)
             # Sensors configuration
@@ -72,8 +86,9 @@ class Configuration(metaclass=Singleton):
                 temp = float(reader[sensor]['threshold'])
                 sensor_parameters['threshold'] = temp
                 temp = reader[sensor]['position']
-                temp = temp.split(',')
-                temp = tuple([float(i) for i in temp])
+                if type(temp) is str:
+                    temp = temp.split(',')
+                    temp = tuple([float(i) for i in temp])
                 sensor_parameters['position'] = temp
                 temp = float(reader[sensor]['mu'])
                 sensor_parameters['mu'] = temp
