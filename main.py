@@ -1,3 +1,4 @@
+import glob
 import math
 import sys
 from bayes.bayesian import Network
@@ -10,6 +11,7 @@ from domain.factory import ProcessFactoryRegistry
 from gspn_model.engine import Engine
 from gspn_model.modelfactory import PlainModelFactory
 from utils.configuration import Configuration
+from utils.utils import check_first_line
 
 
 def run_simulation(geometry: Geometry, num_steps):
@@ -117,8 +119,16 @@ def core(configuration_filename, draw_flag, ext_configuration=None):
 
 if __name__ == '__main__':
     if len(sys.argv) >= 2:
-        configuration_filename = sys.argv[1]
-        drawing_flag = (len(sys.argv) > 2) and (sys.argv.__contains__('--draw'))
-        mtot, isl = core(configuration_filename, drawing_flag)
-        print(f'MToT = {mtot}')
-        print(f'ISL = {isl}')
+        results = dict()
+        configuration_names = list()
+        drawing_flag = sys.argv.__contains__('--draw')
+        dir_flag = sys.argv.__contains__('--dir')
+        if not dir_flag:
+            configuration_names = [sys.argv[1]]
+        else:
+            configuration_names = glob.glob(sys.argv[1] + "/*.ini")
+            configuration_names = list(filter(check_first_line,configuration_names))
+        for filename in configuration_names:
+            mtot, isl = core(filename, drawing_flag)
+            results[filename] = {'MToT': mtot, 'ISL': isl}
+        print(results)

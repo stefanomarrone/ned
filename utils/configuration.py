@@ -70,7 +70,6 @@ class Configuration(metaclass=Singleton):
             if type(temp) is str:
                 temp = temp.split(',')
                 temp = tuple([float(i) for i in temp])
-
             self.put('asset', temp)
             temp = reader['main']['sensors']
             if type(temp) is str:

@@ -1,13 +1,14 @@
+import glob
 import os
 import subprocess
 from enum import Enum
 import copy
-import shutil
 from typing import Union
-
 import numpy as np
-
 from utils.metaclasses import Singleton
+import shutil
+
+from utils.utils import clear_folder
 
 
 class OpType(Enum):
@@ -97,9 +98,15 @@ class GSPN_handler(metaclass=Singleton):
 
     def generic_analysis(self, model_name, model_repo, parameter_list):
         try:
-            # making the directory
+            # removing the directory
             path = f'{os.getcwd()}/{model_repo}/{model_name}_analysis'
-            os.makedirs(path, exist_ok=True)
+            existing = os.path.isdir(path)
+            if not existing:
+                os.makedirs(path, exist_ok=True)
+            else:
+                files = glob.glob(path + '/*')
+                for f in files:
+                    os.remove(f)
             # moving all the file here
             shutil.copy(f'{os.getcwd()}/{model_repo}/{model_name}.def', path)
             shutil.copy(f'{os.getcwd()}/{model_repo}/{model_name}.net', path)
