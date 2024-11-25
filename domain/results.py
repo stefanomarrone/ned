@@ -39,7 +39,8 @@ class Results:
 
     def draw_sensors(self, output_folder):
         num_measures = len(self.sensors.keys())
-        fig, axs = plt.subplots(num_measures, 1, figsize=(20, 6))
+        fig, axs = plt.subplots(num_measures, 1, figsize=(20, 8))
+        plt.subplots_adjust(hspace=0.3)
         i = 0
         for sensor_name in self.sensors.keys():
             sensor = self.sensors[sensor_name]
@@ -67,7 +68,7 @@ class Results:
         axs.plot(data)
         axs.plot(range(len(data)), [thr] * len(data))
         # axs.set_title('asset')
-        axs.set_xlabel("Sample")
+        axs.set_xlabel("time (s)")
         axs.set_ylabel("Count Rate")
         plt.savefig(output_folder + "asset.pdf", format="pdf", bbox_inches="tight")
 
