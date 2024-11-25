@@ -1,13 +1,14 @@
 import glob
 import math
 import sys
+
 from bayes.bayesian import Network
+from domain.factory import ProcessFactoryRegistry
 from domain.geometry import Geometry
 from domain.process import NoMoreDataException
 from domain.results import Results, ActivationRateException
 from domain.sensors import Sensor
 from domain.utils import transport_formula, Asset
-from domain.factory import ProcessFactoryRegistry
 from gspn_model.engine import Engine
 from gspn_model.modelfactory import PlainModelFactory
 from utils.configuration import Configuration
@@ -127,7 +128,7 @@ if __name__ == '__main__':
             configuration_names = [sys.argv[1]]
         else:
             configuration_names = glob.glob(sys.argv[1] + "/*.ini")
-            configuration_names = list(filter(check_first_line,configuration_names))
+            configuration_names = list(filter(check_first_line, configuration_names))
         for filename in configuration_names:
             mtot, isl = core(filename, drawing_flag)
             results[filename] = {'MToT': mtot, 'ISL': isl}

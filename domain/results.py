@@ -32,7 +32,9 @@ class Results:
     def draw_process(self, output_folder):
         plt.figure(figsize=(20, 6))
         plt.plot(self.process)
-        plt.title('process')
+        # plt.title('process')
+        plt.xlabel("time (s)")
+        plt.ylabel("Count Rate")
         plt.savefig(output_folder + "process.pdf", format="pdf", bbox_inches="tight")
 
     def draw_sensors(self, output_folder):
@@ -46,10 +48,15 @@ class Results:
                 axs[i].plot(sensor)
                 axs[i].plot(range(len(sensor)), [thr] * len(sensor))
                 axs[i].set_title(sensor_name)
+                axs[i].set_xlabel("time (s)")
+                axs[i].set_ylabel("Count Rate")
+
             except Exception as e:
                 axs.plot(sensor)
                 axs.plot(range(len(sensor)), [thr] * len(sensor))
                 axs.set_title(sensor_name)
+                axs.xlabel("time (s)")
+                axs.ylabel("Count Rate")
             i += 1
         plt.savefig(output_folder + "sensor.pdf", format="pdf", bbox_inches="tight")
 
@@ -59,7 +66,9 @@ class Results:
         thr = self.thresholds['asset']
         axs.plot(data)
         axs.plot(range(len(data)), [thr] * len(data))
-        axs.set_title('asset')
+        # axs.set_title('asset')
+        axs.set_xlabel("Sample")
+        axs.set_ylabel("Count Rate")
         plt.savefig(output_folder + "asset.pdf", format="pdf", bbox_inches="tight")
 
     def draw(self, output_folder):
