@@ -1,9 +1,9 @@
-from torchgen.packaged.autograd.gen_autograd_functions import process_function
-
-from utils.metaclasses import Singleton
-from configparser import ConfigParser
 import configparser
 import io
+import os
+from configparser import ConfigParser
+
+from utils.metaclasses import Singleton
 from utils.utils import tostring
 
 
@@ -117,10 +117,14 @@ class Configuration(metaclass=Singleton):
         content = tostring(inifile)
         reader = ConfigParser()
         reader.read(inifile)
-        try:
-            includes = reader['main']['include'].split(',')
-            for include in includes:
-                content += '\n' + tostring(include)
-        except Exception as s:
-            print(s)
+
+        includes = reader['main']['include'].split(',')
+        # imposto infolder per i file .ini
+        if 'infolder' in reader['main']:
+            infolder = reader['main']['infolder']
+        else:
+            infolder = os.getcwd()
+        for include in includes:
+            content += '\n' + tostring(f'{infolder}{include}')
+
         return content

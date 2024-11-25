@@ -1,12 +1,12 @@
 import copy
-import json
 import math
 import random
+
 import numpy as np
+import pandas as pd
 
 from main import core
 from utils.configuration import Configuration
-import pandas as pd
 
 c_default = {
     'main': {
@@ -184,14 +184,13 @@ def oat_sensitivity_analysis(c_base, variables, num_samples_per_param):
     for section, params in variables.items():
         for param, details in params.items():
             # Create a base configuration with randomly sampled fixed values
-            fixed_config = populate_configuration(c_base, variables)
+            fixed_config = c_base
 
             # Systematically vary the current parameter
             param_values = [
                 details['range'][0] + (i / (num_samples_per_param - 1)) * (details['range'][1] - details['range'][0])
                 for i in range(num_samples_per_param)
             ]
-
             for value in param_values:
                 # Update the current parameter
                 config = copy.deepcopy(fixed_config)
@@ -241,7 +240,7 @@ def run_oat_analysis(configurations, num_samples_per_param):
         ok_configurations, mtots, isls, resobj: Results from the core function.
     """
     # Generate OAT configurations
-    configurations.extend(oat_sensitivity_analysis(c_base, variables, num_samples_per_param))
+    configurations.extend(oat_sensitivity_analysis(c_default, variables, num_samples_per_param))
     print(len(configurations))
     mtots = []
     isls = []
