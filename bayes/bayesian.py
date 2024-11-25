@@ -44,6 +44,11 @@ class Network:
         # Place)
         detection = {}
         ve = VariableElimination(self.model)
+        # @TODO
+        # When the asset is protected e.g. its value is always False the ve.query fails.
+        # In this edge case we can't find a correct value for the sensing probabilities:
+        # If a sensor works perfectly (psensing ==1) but the asset is protected (its tolerance == +inf)
+        # the sensing prob is useless. To correct in future works
         try:
             result = ve.query(variables=self.sensor_names, evidence={'asset': True}, joint=False)
             for name in self.sensor_names:
