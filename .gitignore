@@ -2,3 +2,6 @@
 pictures/*
 output/*
 data/
+/gspn_model/*.so
+/gspn_model/*.o
+/probabilistic_simulation
