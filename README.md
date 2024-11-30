@@ -1,5 +1,5 @@
 
-# Project Name
+# NED - Nuclear wastE Dss
 
 ## Overview
 This project provides three main features: a Geometry (Domain Modeling) tool for simulating a radioactive process, Bayesian Analysis for assessing sensor and asset performance, and GSPN Models for advanced metric evaluation. 
