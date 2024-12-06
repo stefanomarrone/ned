@@ -50,7 +50,11 @@ pip:
 ```bash
 pip install -r requirements.txt
 ```
-
+**N.B.** to correctly run the tool, the **GreatSPN** software has to be installed on your machine.
+The default path for linux-like machine is ```/opt/greatspn/lib/app/portable_greatspn/bin/```. 
+Change the path accordingly to the installation path in the  ```replication/configuration_ast.ini``` file under the
+```greatspn_bin``` voice.
+A reference to the GreatSPN project is provided in the Acknowledgments section.
 ## Usage
 
 1. Clone the repository.
@@ -64,8 +68,13 @@ make
 4. Run `main.py` to execute the primary workflow:
 
 ```bash
-python main.py
+python main.py replication/configuration_ast.ini --draw
 ```
+The ```replication/configuration_ast.ini``` parameter is mandatory; it provides the path for the configuration file for 
+the execution.
+
+The ```--draw``` flag enables the printing of the results on the directory ```outputs/```automatically generated
+at runtime.
 
 ## Output
 
