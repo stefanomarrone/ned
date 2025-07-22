@@ -98,3 +98,21 @@ repository ([GitHub link](https://github.com/greatspn/SOURCES)) for more informa
 ## Contact
 
 For further information or questions, contact {stefano.marrone, michele.digiovanni}@unicampania.it.
+
+If you use this repository in your work, please cite the following paper:
+
+Di Giovanni, M., Verde, L., Campanile, L., Romoli, M., Sabbarese, C., & Marrone, S. (2025). Assessing Safety and Sustainability of a Monitoring System for Nuclear Waste Management. IEEE Access, 13, 120486–120505. https://doi.org/10.1109/ACCESS.2025.3586735
+
+```
+@ARTICLE{11077155,
+  author={Di Giovanni, Michele and Verde, Laura and Campanile, Lelio and Romoli, Mauro and Sabbarese, Carlo and Marrone, Stefano}, 
+  journal={IEEE Access}, 
+  title={Assessing Safety and Sustainability of a Monitoring System for Nuclear Waste Management}, 
+  year={2025},
+  volume={13},
+  number={},
+  pages={120486-120505},
+  keywords={Monitoring;Radioactive pollution;Safety;Sustainable development;Unified modeling language;Protection;Computer architecture;Internet of Things;Standards;Decision support systems;Decision support system;pre-disposal nuclear waste;Internet of Things;monitoring system;safety assessment;sustainability assessment},
+  doi={10.1109/ACCESS.2025.3586735}
+}
+```
